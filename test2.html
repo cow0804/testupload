@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>區域文字識別工具</title>
+    <title>增强版区域文字识别工具</title>
     <script src="https://unpkg.com/tesseract.js@v4.0.2/dist/tesseract.min.js"></script>
     <style>
         .container {
@@ -12,163 +12,196 @@
         }
         .preview-area {
             position: relative;
+            display: inline-block;
             border: 2px dashed #ccc;
-            margin: 20px 0;
         }
         #imagePreview {
             max-width: 100%;
-            display: none;
+            display: block;
         }
         #selectionBox {
             position: absolute;
             border: 2px solid #ff0000;
             background: rgba(255,0,0,0.1);
+            pointer-events: none;
             display: none;
         }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        #result {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            font-family: monospace;
+        .tooltip {
+            position: absolute;
+            background: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 12px;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>區域數字英文識別工具</h1>
-        
+        <h1>区域数字英文识别工具</h1>
         <input type="file" id="fileInput" accept="image/*">
-        <button onclick="clearSelection()">清除選區</button>
-        
+        <button onclick="clearSelection()">清除选区</button>
         <div class="preview-area">
-            <img id="imagePreview" src="#" alt="預覽圖片">
+            <img id="imagePreview" src="#" alt="预览图片">
             <div id="selectionBox"></div>
+            <div id="tooltip" class="tooltip"></div>
         </div>
-        
-        <div id="result">識別結果將顯示在此處</div>
+        <div id="result" style="margin-top:20px; padding:10px; border:1px solid #ddd;"></div>
     </div>
 
 <script>
 let isDrawing = false;
-let startX, startY;
+let startPos = { x: 0, y: 0 };
 const imagePreview = document.getElementById('imagePreview');
 const selectionBox = document.getElementById('selectionBox');
-const resultDiv = document.getElementById('result');
+const tooltip = document.getElementById('tooltip');
 
-// 初始化區域選取功能
-imagePreview.addEventListener('mousedown', startSelection);
-imagePreview.addEventListener('mousemove', drawSelection);
-imagePreview.addEventListener('mouseup', endSelection);
+// 初始化图片加载监听
+imagePreview.onload = function() {
+    initSelectionSystem();
+    imagePreview.style.cursor = 'crosshair';
+}
 
-// 文件上傳處理
+// 文件上传处理
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
             imagePreview.src = e.target.result;
-            imagePreview.style.display = 'block';
-            resetSelection();
         }
         reader.readAsDataURL(file);
     }
 });
 
-// 核心OCR處理函數（限定數字英文）
-async function processSelectedArea(x, y, width, height) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    // 設定選取區域尺寸
-    canvas.width = width;
-    canvas.height = height;
-    
-    // 繪製選取區域到Canvas
-    ctx.drawImage(
-        imagePreview,
-        x, y, width, height, // 原始圖片選取區域
-        0, 0, width, height  // Canvas繪製區域
-    );
+// 初始化选区系统
+function initSelectionSystem() {
+    // 移除旧事件监听
+    imagePreview.removeEventListener('mousedown', startSelection);
+    imagePreview.removeEventListener('mousemove', drawSelection);
+    imagePreview.removeEventListener('mouseup', endSelection);
 
-    // 影像預處理（提升對比度）
-    const imageData = ctx.getImageData(0, 0, width, height);
-    const data = imageData.data;
-    for(let i = 0; i < data.length; i += 4) {
-        const avg = (data[i] + data[i+1] + data[i+2]) / 3;
-        const threshold = avg > 128 ? 255 : 0;
-        data[i] = data[i+1] = data[i+2] = threshold;
-    }
-    ctx.putImageData(imageData, 0, 0);
-
-    // Tesseract設定
-    const worker = await Tesseract.createWorker();
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
-    
-    // 嚴格限定數字英文
-    await worker.setParameters({
-        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-        tessedit_pageseg_mode: '7',  // 單行模式
-        tessedit_ocr_engine_mode: '3' // LSTM引擎
-    });
-
-    const { data: { text } } = await worker.recognize(canvas);
-    resultDiv.innerHTML = text.replace(/[^\w]/g, ' '); // 過濾特殊符號
-    await worker.terminate();
+    // 绑定新事件
+    imagePreview.addEventListener('mousedown', startSelection);
+    imagePreview.addEventListener('mousemove', drawSelection);
+    imagePreview.addEventListener('mouseup', endSelection);
 }
 
-// 區域選取事件處理
+// 坐标转换函数
+function convertClientToImage(clientX, clientY) {
+    const rect = imagePreview.getBoundingClientRect();
+    const scaleX = imagePreview.naturalWidth / imagePreview.width;
+    const scaleY = imagePreview.naturalHeight / imagePreview.height;
+    
+    return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+    };
+}
+
+// 事件处理函数
 function startSelection(e) {
     isDrawing = true;
-    const rect = imagePreview.getBoundingClientRect();
-    startX = e.clientX - rect.left;
-    startY = e.clientY - rect.top;
+    const pos = convertClientToImage(e.clientX, e.clientY);
+    startPos = { x: pos.x, y: pos.y };
+    
     selectionBox.style.display = 'block';
+    updateSelectionBox(pos.x, pos.y, 0, 0);
 }
 
 function drawSelection(e) {
     if (!isDrawing) return;
-    const rect = imagePreview.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
     
-    selectionBox.style.left = Math.min(startX, currentX) + 'px';
-    selectionBox.style.top = Math.min(startY, currentY) + 'px';
-    selectionBox.style.width = Math.abs(currentX - startX) + 'px';
-    selectionBox.style.height = Math.abs(currentY - startY) + 'px';
+    const currentPos = convertClientToImage(e.clientX, e.clientY);
+    const width = currentPos.x - startPos.x;
+    const height = currentPos.y - startPos.y;
+    
+    updateSelectionBox(startPos.x, startPos.y, width, height);
+    showTooltip(e.clientX, e.clientY, width, height);
 }
 
 function endSelection(e) {
+    if (!isDrawing) return;
     isDrawing = false;
-    const rect = imagePreview.getBoundingClientRect();
-    const endX = e.clientX - rect.left;
-    const endY = e.clientY - rect.top;
     
-    const x = Math.min(startX, endX) * (imagePreview.naturalWidth / imagePreview.width);
-    const y = Math.min(startY, endY) * (imagePreview.naturalHeight / imagePreview.height);
-    const width = Math.abs(endX - startX) * (imagePreview.naturalWidth / imagePreview.width);
-    const height = Math.abs(endY - startY) * (imagePreview.naturalHeight / imagePreview.height);
+    const endPos = convertClientToImage(e.clientX, e.clientY);
+    const width = endPos.x - startPos.x;
+    const height = endPos.y - startPos.y;
     
-    processSelectedArea(x, y, width, height);
+    // 确保选区最小尺寸
+    if (Math.abs(width) < 10 || Math.abs(height) < 10) {
+        alert('请选择更大的区域');
+        return;
+    }
+    
+    processSelectedArea(
+        Math.min(startPos.x, endPos.x),
+        Math.min(startPos.y, endPos.y),
+        Math.abs(width),
+        Math.abs(height)
+    );
+}
+
+// 更新选区可视化
+function updateSelectionBox(x, y, width, height) {
+    const scaleX = imagePreview.width / imagePreview.naturalWidth;
+    const scaleY = imagePreview.height / imagePreview.naturalHeight;
+    
+    selectionBox.style.left = (x * scaleX) + 'px';
+    selectionBox.style.top = (y * scaleY) + 'px';
+    selectionBox.style.width = (width * scaleX) + 'px';
+    selectionBox.style.height = (height * scaleY) + 'px';
+}
+
+// 显示尺寸提示
+function showTooltip(clientX, clientY, width, height) {
+    tooltip.style.display = 'block';
+    tooltip.style.left = (clientX + 10) + 'px';
+    tooltip.style.top = (clientY + 10) + 'px';
+    tooltip.textContent = `${Math.abs(width)}x${Math.abs(height)} 像素`;
+}
+
+// OCR处理核心
+async function processSelectedArea(x, y, width, height) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = width;
+    canvas.height = height;
+    
+    ctx.drawImage(imagePreview, x, y, width, height, 0, 0, width, height);
+    
+    // 增强预处理
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+    for(let i = 0; i < data.length; i += 4) {
+        const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+        data[i] = data[i+1] = data[i+2] = avg > 128 ? 255 : 0; // 二值化
+        data[i+3] = 255; // 确保不透明度
+    }
+    ctx.putImageData(imageData, 0, 0);
+
+    // Tesseract配置
+    const worker = await Tesseract.createWorker();
+    await worker.loadLanguage('eng');
+    await worker.initialize('eng');
+    
+    await worker.setParameters({
+        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+        tessedit_pageseg_mode: '6',
+        tessedit_ocr_engine_mode: '3',
+        classify_bln_numeric_mode: '1'
+    });
+
+    const { data: { text } } = await worker.recognize(canvas);
+    document.getElementById('result').textContent = text.replace(/[^\w]/g, ' ');
+    await worker.terminate();
 }
 
 function clearSelection() {
     selectionBox.style.display = 'none';
-    resultDiv.innerHTML = '已清除選區';
-}
-
-function resetSelection() {
-    clearSelection();
-    selectionBox.style.width = '0';
-    selectionBox.style.height = '0';
+    tooltip.style.display = 'none';
+    document.getElementById('result').textContent = '已清除选区';
 }
 </script>
 </body>
