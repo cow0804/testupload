@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>選取區域文字提取工具</title>
+    <title>區域文字識別工具</title>
     <script src="https://unpkg.com/tesseract.js@v4.0.2/dist/tesseract.min.js"></script>
     <style>
         .container {
@@ -10,39 +10,20 @@
             margin: 20px auto;
             padding: 20px;
         }
-        .input-section {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
         .preview-area {
             position: relative;
             border: 2px dashed #ccc;
-            padding: 20px;
-            text-align: center;
+            margin: 20px 0;
         }
-        #videoPreview, #imagePreview {
+        #imagePreview {
             max-width: 100%;
-            max-height: 400px;
-        }
-        .selection-box {
-            position: absolute;
-            border: 2px solid #4CAF50;
-            background: rgba(76, 175, 80, 0.2);
             display: none;
         }
-        .result-table {
-            margin-top: 20px;
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .result-table th, .result-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .result-table th {
-            background-color: #f5f5f5;
+        #selectionBox {
+            position: absolute;
+            border: 2px solid #ff0000;
+            background: rgba(255,0,0,0.1);
+            display: none;
         }
         button {
             padding: 10px 20px;
@@ -52,202 +33,143 @@
             cursor: pointer;
             margin-right: 10px;
         }
-        button:hover {
-            background-color: #45a049;
-        }
-        #processingStatus {
-            margin: 20px 0;
+        #result {
+            margin-top: 20px;
             padding: 10px;
-            background-color: #f8f8f8;
-            border-left: 4px solid #4CAF50;
+            border: 1px solid #ddd;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>選取區域文字提取工具</h1>
+        <h1>區域數字英文識別工具</h1>
         
-        <div class="input-section">
-            <div>
-                <button onclick="startCamera('environment')">開啟後置鏡頭</button>
-                <button onclick="startCamera('user')">開啟前置鏡頭</button>
-                <button onclick="capturePhoto()">拍攝照片</button>
-            </div>
-            <div>
-                <input type="file" id="fileInput" accept="image/*">
-            </div>
+        <input type="file" id="fileInput" accept="image/*">
+        <button onclick="clearSelection()">清除選區</button>
+        
+        <div class="preview-area">
+            <img id="imagePreview" src="#" alt="預覽圖片">
+            <div id="selectionBox"></div>
         </div>
-
-        <div class="preview-area" id="previewArea">
-            <video id="videoPreview" autoplay></video>
-            <img id="imagePreview" src="#" alt="預覽圖片" onload="handleImageLoad()">
-            <div class="selection-box" id="selectionBox"></div>
-        </div>
-
-        <div id="processingStatus">等待操作...</div>
-        <table class="result-table" id="resultTable"></table>
+        
+        <div id="result">識別結果將顯示在此處</div>
     </div>
 
-    <script>
-        let stream = null;
-        const video = document.getElementById('videoPreview');
-        const imagePreview = document.getElementById('imagePreview');
-        const fileInput = document.getElementById('fileInput');
-        const statusDiv = document.getElementById('processingStatus');
-        const resultTable = document.getElementById('resultTable');
-        const previewArea = document.getElementById('previewArea');
-        const selectionBox = document.getElementById('selectionBox');
+<script>
+let isDrawing = false;
+let startX, startY;
+const imagePreview = document.getElementById('imagePreview');
+const selectionBox = document.getElementById('selectionBox');
+const resultDiv = document.getElementById('result');
 
-        let isSelecting = false;
-        let startX, startY, endX, endY;
+// 初始化區域選取功能
+imagePreview.addEventListener('mousedown', startSelection);
+imagePreview.addEventListener('mousemove', drawSelection);
+imagePreview.addEventListener('mouseup', endSelection);
 
-        // 啟動相機
-        async function startCamera(facingMode = 'environment') {
-            try {
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                }
-
-                const constraints = {
-                    video: { facingMode: facingMode }
-                };
-
-                stream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = stream;
-                imagePreview.style.display = 'none';
-                video.style.display = 'block';
-                statusDiv.innerHTML = `已啟動 ${facingMode === 'environment' ? '後置' : '前置'} 鏡頭，請拍攝照片`;
-            } catch (err) {
-                alert('無法訪問相機: ' + err);
-            }
-        }
-
-        // 拍攝照片
-        function capturePhoto() {
-            if (!stream) {
-                alert('請先開啟鏡頭！');
-                return;
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            imagePreview.src = canvas.toDataURL('image/png');
+// 文件上傳處理
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
             imagePreview.style.display = 'block';
-            video.style.display = 'none';
+            resetSelection();
         }
+        reader.readAsDataURL(file);
+    }
+});
 
-        // 處理文件上傳
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    imagePreview.style.display = 'block';
-                    video.style.display = 'none';
-                }
-                reader.readAsDataURL(file);
-            }
-        });
+// 核心OCR處理函數（限定數字英文）
+async function processSelectedArea(x, y, width, height) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // 設定選取區域尺寸
+    canvas.width = width;
+    canvas.height = height;
+    
+    // 繪製選取區域到Canvas
+    ctx.drawImage(
+        imagePreview,
+        x, y, width, height, // 原始圖片選取區域
+        0, 0, width, height  // Canvas繪製區域
+    );
 
-        // 圖片載入完成後處理
-        function handleImageLoad() {
-            if (imagePreview.width === 0 || imagePreview.height === 0) {
-                statusDiv.innerHTML = '錯誤：圖片尺寸為 0，請重新選擇圖片。';
-                return;
-            }
-            setupSelection();
-        }
+    // 影像預處理（提升對比度）
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+    for(let i = 0; i < data.length; i += 4) {
+        const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+        const threshold = avg > 128 ? 255 : 0;
+        data[i] = data[i+1] = data[i+2] = threshold;
+    }
+    ctx.putImageData(imageData, 0, 0);
 
-        // 設置選取區域
-        function setupSelection() {
-            previewArea.addEventListener('mousedown', (e) => {
-                isSelecting = true;
-                startX = e.offsetX;
-                startY = e.offsetY;
-                selectionBox.style.left = startX + 'px';
-                selectionBox.style.top = startY + 'px';
-                selectionBox.style.width = '0';
-                selectionBox.style.height = '0';
-                selectionBox.style.display = 'block';
-            });
+    // Tesseract設定
+    const worker = await Tesseract.createWorker();
+    await worker.loadLanguage('eng');
+    await worker.initialize('eng');
+    
+    // 嚴格限定數字英文
+    await worker.setParameters({
+        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+        tessedit_pageseg_mode: '7',  // 單行模式
+        tessedit_ocr_engine_mode: '3' // LSTM引擎
+    });
 
-            previewArea.addEventListener('mousemove', (e) => {
-                if (isSelecting) {
-                    endX = e.offsetX;
-                    endY = e.offsetY;
-                    selectionBox.style.width = Math.abs(endX - startX) + 'px';
-                    selectionBox.style.height = Math.abs(endY - startY) + 'px';
-                    selectionBox.style.left = Math.min(startX, endX) + 'px';
-                    selectionBox.style.top = Math.min(startY, endY) + 'px';
-                }
-            });
+    const { data: { text } } = await worker.recognize(canvas);
+    resultDiv.innerHTML = text.replace(/[^\w]/g, ' '); // 過濾特殊符號
+    await worker.terminate();
+}
 
-            previewArea.addEventListener('mouseup', () => {
-                isSelecting = false;
-                processSelectedArea();
-            });
-        }
+// 區域選取事件處理
+function startSelection(e) {
+    isDrawing = true;
+    const rect = imagePreview.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
+    selectionBox.style.display = 'block';
+}
 
-        // 處理選取區域
-        async function processSelectedArea() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const rect = selectionBox.getBoundingClientRect();
-            const imgRect = imagePreview.getBoundingClientRect();
+function drawSelection(e) {
+    if (!isDrawing) return;
+    const rect = imagePreview.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+    
+    selectionBox.style.left = Math.min(startX, currentX) + 'px';
+    selectionBox.style.top = Math.min(startY, currentY) + 'px';
+    selectionBox.style.width = Math.abs(currentX - startX) + 'px';
+    selectionBox.style.height = Math.abs(currentY - startY) + 'px';
+}
 
-            const scaleX = imagePreview.naturalWidth / imgRect.width;
-            const scaleY = imagePreview.naturalHeight / imgRect.height;
+function endSelection(e) {
+    isDrawing = false;
+    const rect = imagePreview.getBoundingClientRect();
+    const endX = e.clientX - rect.left;
+    const endY = e.clientY - rect.top;
+    
+    const x = Math.min(startX, endX) * (imagePreview.naturalWidth / imagePreview.width);
+    const y = Math.min(startY, endY) * (imagePreview.naturalHeight / imagePreview.height);
+    const width = Math.abs(endX - startX) * (imagePreview.naturalWidth / imagePreview.width);
+    const height = Math.abs(endY - startY) * (imagePreview.naturalHeight / imagePreview.height);
+    
+    processSelectedArea(x, y, width, height);
+}
 
-            const x = (rect.left - imgRect.left) * scaleX;
-            const y = (rect.top - imgRect.top) * scaleY;
-            const width = rect.width * scaleX;
-            const height = rect.height * scaleY;
+function clearSelection() {
+    selectionBox.style.display = 'none';
+    resultDiv.innerHTML = '已清除選區';
+}
 
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(imagePreview, x, y, width, height, 0, 0, width, height);
-
-            processImage(canvas);
-        }
-
-        // 影像處理核心邏輯
-        async function processImage(imageSource) {
-            statusDiv.innerHTML = '正在進行影像預處理...';
-            resultTable.innerHTML = '';
-
-            try {
-                const worker = await Tesseract.createWorker({
-                    logger: m => statusDiv.innerHTML += `<br>${m.status}`
-                });
-
-                await worker.loadLanguage('eng');
-                await worker.initialize('eng');
-                
-                // 限制只識別數字和英文
-                await worker.setParameters({
-                    tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-                    tessedit_pageseg_mode: '6',
-                    tessedit_ocr_engine_mode: '3',
-                    preserve_interword_spaces: '1'
-                });
-
-                const { data: { text } } = await worker.recognize(imageSource);
-                
-                // 顯示識別結果
-                resultTable.innerHTML = `
-                    <thead><tr><th>識別結果</th></tr></thead>
-                    <tbody><tr><td>${text}</td></tr></tbody>
-                `;
-                
-                await worker.terminate();
-                statusDiv.innerHTML = '解析完成！';
-            } catch (err) {
-                statusDiv.innerHTML = '處理失敗: ' + err.message;
-            }
-        }
-    </script>
+function resetSelection() {
+    clearSelection();
+    selectionBox.style.width = '0';
+    selectionBox.style.height = '0';
+}
+</script>
 </body>
 </html>
