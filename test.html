@@ -74,11 +74,7 @@
             worker = w;
             return worker.loadLanguage('chi_tra+eng');
         }).then(() => worker.initialize('chi_tra+eng'));
-// 在 worker.initialize 後添加
-await worker.setParameters({
-    tessedit_pageseg_mode: '6',  // 設定為單一文本塊模式
-    tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,-:()%' // 限制識別字符集
-});
+
         // 啟動鏡頭
         async function startCamera() {
             try {
