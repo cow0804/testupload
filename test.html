@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圖片文字轉表格</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #preview {
+            max-width: 100%;
+            margin: 20px 0;
+        }
+        #resultTable {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        #resultTable th, #resultTable td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #resultTable th {
+            background-color: #f2f2f2;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        #searchContainer {
+            margin: 20px 0;
+        }
+        #searchInput {
+            padding: 8px;
+            width: 200px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>圖片文字轉表格</h1>
+    
+    <div>
+        <input type="file" id="imageInput" accept="image/*" capture="camera">
+        <button class="button" onclick="processImage()">處理圖片</button>
+    </div>
+
+    <img id="preview" alt="圖片預覽">
+    
+    <div id="searchContainer">
+        <input type="text" id="searchInput" placeholder="輸入關鍵字搜索..." onkeyup="searchTable()">
+    </div>
+
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>欄位</th>
+                <th>內容</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const tableBody = document.getElementById('tableBody');
+        const searchInput = document.getElementById('searchInput');
+
+        // 預覽圖片
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+            }
+        });
+
+        async function processImage() {
+            const file = imageInput.files[0];
+            if (!file) {
+                alert('請先選擇圖片');
+                return;
+            }
+
+            try {
+                // 使用 Tesseract.js 進行 OCR
+                const { data: { text } } = await Tesseract.recognize(
+                    file,
+                    'eng+chi_tra',
+                    {
+                        logger: m => console.log(m)
+                    }
+                );
+
+                // 清空之前的表格內容
+                tableBody.innerHTML = '';
+
+                // 簡單的文字處理，將內容按行分割
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                
+                // 生成表格
+                lines.forEach(line => {
+                    const [key, value] = line.split(/[:：]/).map(item => item.trim());
+                    if (key && value) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${key}</td>
+                            <td>${value}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    }
+                });
+
+                if (tableBody.children.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="2">未檢測到有效的鍵值對內容</td></tr>';
+                }
+
+            } catch (error) {
+                console.error('處理錯誤:', error);
+                tableBody.innerHTML = '<tr><td colspan="2">處理圖片時發生錯誤</td></tr>';
+            }
+        }
+
+        // 表格搜索功能
+        function searchTable() {
+            const filter = searchInput.value.toLowerCase();
+            const rows = tableBody.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let match = false;
+
+                // 檢查每一列（欄位和內容）
+                for (let j = 0; j < cells.length; j++) {
+                    const cellText = cells[j].textContent || cells[j].innerText;
+                    if (cellText.toLowerCase().indexOf(filter) > -1) {
+                        match = true;
+                        break;
+                    }
+                }
+
+                // 根據是否匹配顯示或隱藏行
+                rows[i].style.display = match ? '' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>
