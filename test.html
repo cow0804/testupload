@@ -1,155 +1,197 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>鏡頭文字識別與記錄</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圖片文字轉表格（僅英文和數字）</title>
     <style>
-        .container {
+        body {
+            font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
-        #cameraPreview {
-            width: 100%;
-            border: 1px solid #ccc;
+        #preview {
+            max-width: 100%;
+            margin: 20px 0;
         }
-        .button-group {
-            margin: 10px 0;
-        }
-        button {
-            padding: 8px 16px;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
+        #resultTable {
             border-collapse: collapse;
+            width: 100%;
             margin-top: 20px;
         }
-        th, td {
+        #resultTable th, #resultTable td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
-        th {
+        #resultTable th {
             background-color: #f2f2f2;
         }
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        #searchContainer {
+            margin: 20px 0;
+        }
+        #searchInput {
+            padding: 8px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        #cropContainer {
+            margin: 20px 0;
+            position: relative;
+        }
     </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="button-group">
-            <button onclick="startCamera()">啟動鏡頭</button>
-            <button onclick="captureImage()">拍攝識別</button>
-            <button onclick="exportCSV()">導出CSV</button>
-        </div>
-        <video id="cameraPreview" autoplay></video>
-        <canvas id="canvas" style="display:none;"></canvas>
-        
-        <h3>識別結果：</h3>
-        <table id="resultTable">
-            <thead>
-                <tr>
-                    <th>序號</th>
-                    <th>內容</th>
-                    <th>識別時間</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-            </tbody>
-        </table>
+    <h1>圖片文字轉表格（僅英文和數字）</h1>
+    
+    <div>
+        <input type="file" id="imageInput" accept="image/*" capture="camera">
+        <button class="button" onclick="showCropper()">顯示裁剪區域</button>
+        <button class="button" onclick="processImage()">處理圖片</button>
     </div>
 
-    <!-- 引入 Tesseract.js -->
-    <script src="https://unpkg.com/tesseract.js@v3.0.3/dist/tesseract.min.js"></script>
+    <div id="cropContainer">
+        <img id="preview" alt="圖片預覽">
+    </div>
     
+    <div id="searchContainer">
+        <input type="text" id="searchInput" placeholder="輸入關鍵字搜索..." onkeyup="searchTable()">
+    </div>
+
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>欄位</th>
+                <th>內容</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script>
-        let videoStream = null;
-        let worker = null;
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const tableBody = document.getElementById('tableBody');
+        const searchInput = document.getElementById('searchInput');
+        let cropper;
 
-        // 初始化 Tesseract
-        Tesseract.createWorker({
-            logger: m => console.log(m)
-        }).then(w => {
-            worker = w;
-            return worker.loadLanguage('eng');
-        }).then(() => worker.initialize('eng'));
-
-        // 啟動鏡頭
-        async function startCamera() {
-            try {
-                const video = document.getElementById('cameraPreview');
-                videoStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment" } 
-                });
-                video.srcObject = videoStream;
-            } catch (err) {
-                console.error("無法訪問鏡頭:", err);
-            }
-        }
-
-        // 拍攝並識別
-        async function captureImage() {
-            const video = document.getElementById('cameraPreview');
-            const canvas = document.getElementById('canvas');
-            const context = canvas.getContext('2d');
-            
-            // 設置 canvas 尺寸與影片相同
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0);
-            
-            // 使用 Tesseract 進行 OCR
-            const { data: { text } } = await worker.recognize(canvas);
-            
-            // 將結果添加到表格
-            addToTable(text);
-        }
-
-        // 添加數據到表格
-        function addToTable(text) {
-            const tbody = document.getElementById('tableBody');
-            const now = new Date().toLocaleString();
-            
-            const newRow = `
-                <tr>
-                    <td>${tbody.children.length + 1}</td>
-                    <td contenteditable="true">${text.replace(/\n/g, '<br>')}</td>
-                    <td>${now}</td>
-                </tr>
-            `;
-            
-            tbody.insertAdjacentHTML('beforeend', newRow);
-        }
-
-        // 導出 CSV
-        function exportCSV() {
-            const rows = document.querySelectorAll('#tableBody tr');
-            let csvContent = "data:text/csv;charset=utf-8,序號,內容,識別時間\n";
-            
-            rows.forEach(row => {
-                const cells = row.cells;
-                const text = cells[1].innerText.replace(/\n/g, ' ').replace(/"/g, '""');
-                csvContent += `"${cells[0].innerText}","${text}","${cells[2].innerText}"\n`;
-            });
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "識別結果.csv");
-            document.body.appendChild(link);
-            link.click();
-        }
-
-        // 關閉鏡頭當頁面卸載時
-        window.addEventListener('beforeunload', () => {
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-            }
-            if (worker) {
-                worker.terminate();
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                console.log('文件已選擇:', file.name);
+                if (cropper) cropper.destroy();
             }
         });
+
+        function showCropper() {
+            if (!preview.src) {
+                alert('請先選擇圖片');
+                return;
+            }
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(preview, {
+                aspectRatio: NaN,
+                viewMode: 1,
+                movable: true,
+                zoomable: true,
+                scalable: true,
+                responsive: true,
+                autoCropArea: 0.5
+            });
+        }
+
+        async function processImage() {
+            const file = imageInput.files[0];
+            if (!file) {
+                alert('請先選擇圖片');
+                return;
+            }
+
+            tableBody.innerHTML = '<tr><td colspan="2">處理中，請稍候...</td></tr>';
+            try {
+                let imageToProcess = file;
+                if (cropper) {
+                    const canvas = cropper.getCroppedCanvas({ width: 800, height: 600 });
+                    const context = canvas.getContext('2d');
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    for (let i = 0; i < data.length; i += 4) {
+                        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        const binary = avg > 128 ? 255 : 0;
+                        data[i] = data[i + 1] = data[i + 2] = binary;
+                    }
+                    context.putImageData(imageData, 0, 0);
+                    imageToProcess = await new Promise(resolve => {
+                        canvas.toBlob(blob => resolve(blob), 'image/jpeg');
+                    });
+                }
+
+                console.log('開始 OCR 處理');
+                const { data: { text } } = await Tesseract.recognize(
+                    imageToProcess,
+                    'eng',
+                    {
+                        logger: m => console.log(m.status, m.progress),
+                        tessedit_pageseg_mode: '6',
+                        tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789: '
+                    }
+                );
+                console.log('OCR 完成:', text);
+
+                tableBody.innerHTML = '';
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                if (lines.length > 0) {
+                    lines.forEach(line => {
+                        const parts = line.split(/[:\s]+/).filter(part => part.trim());
+                        const row = document.createElement('tr');
+                        if (parts.length >= 2) {
+                            row.innerHTML = `<td>${parts[0]}</td><td>${parts.slice(1).join(' ')}</td>`;
+                        } else {
+                            row.innerHTML = `<td>文字</td><td>${line}</td>`;
+                        }
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="2">未檢測到任何文字</td></tr>';
+                }
+            } catch (error) {
+                console.error('OCR 錯誤:', error);
+                tableBody.innerHTML = '<tr><td colspan="2">處理失敗: ' + error.message + '</td></tr>';
+            }
+        }
+
+        function searchTable() {
+            const filter = searchInput.value.toLowerCase();
+            const rows = tableBody.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let match = false;
+                for (let j = 0; j < cells.length; j++) {
+                    const cellText = cells[j].textContent || cells[j].innerText;
+                    if (cellText.toLowerCase().indexOf(filter) > -1) {
+                        match = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = match ? '' : 'none';
+            }
+        }
     </script>
 </body>
 </html>
