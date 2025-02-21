@@ -122,49 +122,60 @@
 
         // 處理圖片
         async function processImage() {
-            const file = imageInput.files[0];
-            if (!file) {
-                alert('請先選擇圖片');
-                return;
-            }
+        async function processImage() {
+    const file = imageInput.files[0];
+    if (!file) {
+        alert('請先選擇圖片');
+        return;
+    }
 
-            tableBody.innerHTML = '<tr><td colspan="2">處理中，請稍候...</td></tr>';
-            try {
-                let imageToProcess = file;
-                if (cropper) {
-                    // 獲取裁剪後的圖片
-                    const canvas = cropper.getCroppedCanvas();
-                    imageToProcess = await new Promise(resolve => {
-                        canvas.toBlob(blob => resolve(blob), 'image/jpeg');
-                    });
-                }
-
-                console.log('開始 OCR 處理');
-                const { data: { text } } = await Tesseract.recognize(
-                    imageToProcess,
-                    'eng+chi_tra',
-                    { logger: m => console.log(m.status, m.progress) }
-                );
-                console.log('OCR 完成:', text);
-
-                tableBody.innerHTML = '';
-                const lines = text.split('\n').filter(line => line.trim() !== '');
-                lines.forEach(line => {
-                    const parts = line.split(/[:：\s]+/).filter(part => part.trim());
-                    if (parts.length >= 2) {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `<td>${parts[0]}</td><td>${parts.slice(1).join(' ')}</td>`;
-                        tableBody.appendChild(row);
-                    }
-                });
-                if (tableBody.children.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="2">未檢測到有效內容</td></tr>';
-                }
-            } catch (error) {
-                console.error('OCR 錯誤:', error);
-                tableBody.innerHTML = '<tr><td colspan="2">處理失敗: ' + error.message + '</td></tr>';
-            }
+    tableBody.innerHTML = '<tr><td colspan="2">處理中，請稍候...</td></tr>';
+    try {
+        let imageToProcess = file;
+        if (cropper) {
+            const canvas = cropper.getCroppedCanvas({
+                width: 800,
+                height: 600,
+                imageSmoothingQuality: 'high'
+            });
+            imageToProcess = await new Promise(resolve => {
+                canvas.toBlob(blob => resolve(blob), 'image/jpeg');
+            });
         }
+
+        console.log('開始 OCR 處理');
+        const { data: { text } } = await Tesseract.recognize(
+            imageToProcess,
+            'chi_tra',
+            {
+                logger: m => console.log(m.status, m.progress),
+                tessedit_pageseg_mode: '6',
+                tessedit_char_whitelist: '：姓名電話地址abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+            }
+        );
+        console.log('OCR 完成:', text);
+
+        tableBody.innerHTML = '';
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        if (lines.length > 0) {
+            lines.forEach(line => {
+                const parts = line.split(/[:：\s]+/).filter(part => part.trim());
+                const row = document.createElement('tr');
+                if (parts.length >= 2) {
+                    row.innerHTML = `<td>${parts[0]}</td><td>${parts.slice(1).join(' ')}</td>`;
+                } else {
+                    row.innerHTML = `<td>文字</td><td>${line}</td>`;
+                }
+                tableBody.appendChild(row);
+            });
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="2">未檢測到任何文字</td></tr>';
+        }
+    } catch (error) {
+        console.error('OCR 錯誤:', error);
+        tableBody.innerHTML = '<tr><td colspan="2">處理失敗: ' + error.message + '</td></tr>';
+    }
+}
 
         // 表格搜索功能
         function searchTable() {
