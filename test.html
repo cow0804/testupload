@@ -54,6 +54,32 @@
             background-color: #f8f8f8;
             border-left: 4px solid #4CAF50;
         }
+        .history-section {
+            margin-top: 30px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .history-item {
+            padding: 8px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .history-item:hover {
+            background-color: #f1f1f1;
+        }
+        .export-buttons {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -77,6 +103,16 @@
 
         <div id="processingStatus">等待操作...</div>
         <table class="result-table" id="resultTable"></table>
+
+        <div class="history-section">
+            <h3>歷史記錄</h3>
+            <button onclick="clearHistory()">清除記錄</button>
+            <div class="history-list" id="historyList"></div>
+            <div class="export-buttons">
+                <button onclick="exportCSV()">匯出CSV</button>
+                <button onclick="exportJSON()">匯出JSON</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -86,6 +122,7 @@
         const fileInput = document.getElementById('fileInput');
         const statusDiv = document.getElementById('processingStatus');
         const resultTable = document.getElementById('resultTable');
+        let historyData = [];
 
         // 啟動相機
         async function startCamera() {
@@ -174,35 +211,21 @@
                 });
 
                 // 生成表格HTML
-                let tableHTML = '';
-                tableData.forEach((row, index) => {
-                    if (index === 0) {
-                        // 表頭
-                        tableHTML += '<thead><tr>';
-                        row.forEach(cell => {
-                            tableHTML += `<th>${cell}</th>`;
-                        });
-                        // 補齊表頭
-                        for (let i = row.length; i < maxColumns; i++) {
-                            tableHTML += '<th></th>';
-                        }
-                        tableHTML += '</tr></thead><tbody>';
-                    } else {
-                        // 表體
-                        tableHTML += '<tr>';
-                        row.forEach(cell => {
-                            tableHTML += `<td>${cell}</td>`;
-                        });
-                        // 補齊單元格
-                        for (let i = row.length; i < maxColumns; i++) {
-                            tableHTML += '<td></td>';
-                        }
-                        tableHTML += '</tr>';
-                    }
-                });
-                tableHTML += '</tbody>';
+                renderTable(tableData);
 
-                resultTable.innerHTML = tableHTML;
+                // 保存歷史記錄
+                const timestamp = new Date().toLocaleString('zh-TW');
+                historyData.unshift({
+                    timestamp,
+                    data: tableData
+                });
+                
+                // 保留最多50條記錄
+                if (historyData.length > 50) historyData.pop();
+                
+                saveHistory();
+                renderHistory();
+
                 statusDiv.innerHTML = `分析完成！共處理 ${tableData.length} 行資料`;
                 
                 await worker.terminate();
@@ -210,6 +233,98 @@
                 statusDiv.innerHTML = '處理失敗: ' + err.message;
             }
         }
+
+        // 渲染表格
+        function renderTable(data) {
+            let tableHTML = '';
+            data.forEach((row, index) => {
+                if (index === 0) {
+                    // 表頭
+                    tableHTML += '<thead><tr>';
+                    row.forEach(cell => {
+                        tableHTML += `<th>${cell}</th>`;
+                    });
+                    tableHTML += '</tr></thead><tbody>';
+                } else {
+                    // 表體
+                    tableHTML += '<tr>';
+                    row.forEach(cell => {
+                        tableHTML += `<td>${cell}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                }
+            });
+            tableHTML += '</tbody>';
+            resultTable.innerHTML = tableHTML;
+        }
+
+        // 保存記錄到localStorage
+        function saveHistory() {
+            localStorage.setItem('ocrHistory', JSON.stringify(historyData));
+        }
+
+        // 載入歷史記錄
+        function loadHistory() {
+            const saved = localStorage.getItem('ocrHistory');
+            if (saved) {
+                historyData = JSON.parse(saved);
+                renderHistory();
+            }
+        }
+
+        // 渲染歷史記錄列表
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            container.innerHTML = historyData.map((record, index) => `
+                <div class="history-item" onclick="showRecord(${index})">
+                    ${record.timestamp} - ${record.data.length} 行數據
+                </div>
+            `).join('');
+        }
+
+        // 顯示指定記錄
+        function showRecord(index) {
+            const record = historyData[index];
+            renderTable(record.data);
+        }
+
+        // 清除歷史記錄
+        function clearHistory() {
+            historyData = [];
+            saveHistory();
+            renderHistory();
+            resultTable.innerHTML = '';
+        }
+
+        // 匯出CSV
+        function exportCSV() {
+            const csvContent = historyData.map(record => 
+                record.data.map(row => 
+                    row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')
+                ).join('\n')
+            ).join('\n\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `ocr_export_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        // 匯出JSON
+        function exportJSON() {
+            const jsonString = JSON.stringify(historyData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `ocr_export_${new Date().toISOString().slice(0,10)}.json`;
+            link.click();
+        }
+
+        // 初始化時載入歷史記錄
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+        });
     </script>
 </body>
 </html>
