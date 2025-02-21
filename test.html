@@ -72,8 +72,8 @@
             logger: m => console.log(m)
         }).then(w => {
             worker = w;
-            return worker.loadLanguage('chi_tra+eng');
-        }).then(() => worker.initialize('chi_tra+eng'));
+            return worker.loadLanguage('eng');
+        }).then(() => worker.initialize('eng'));
 
         // 啟動鏡頭
         async function startCamera() {
