@@ -74,7 +74,16 @@
             worker = w;
             return worker.loadLanguage('chi_tra+eng');
         }).then(() => worker.initialize('chi_tra+eng'));
+// 在 worker.initialize 後添加
+await worker.setParameters({
+    tessedit_pageseg_mode: '6',  // 設定為單一文本塊模式
+    tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,-:()%' // 限制識別字符集
+});
 
+// 在 captureImage 函數中添加圖像預處理
+context.drawImage(video, 0, 0);
+context.filter = 'contrast(1.2) grayscale(1)';  // 增加對比度並轉灰階
+context.drawImage(canvas, 0, 0);
         // 啟動鏡頭
         async function startCamera() {
             try {
