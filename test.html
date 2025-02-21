@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>多語言文字辨識轉表格工具</title>
+    <title>文字與數字辨識工具</title>
     <script src="https://unpkg.com/tesseract.js@v4.0.2/dist/tesseract.min.js"></script>
     <style>
         .container {
@@ -24,18 +24,13 @@
             max-width: 100%;
             max-height: 400px;
         }
-        .result-table {
+        #resultText {
             margin-top: 20px;
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .result-table th, .result-table td {
+            padding: 10px;
             border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .result-table th {
-            background-color: #f5f5f5;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+            font-family: monospace;
         }
         button {
             padding: 10px 20px;
@@ -54,37 +49,11 @@
             background-color: #f8f8f8;
             border-left: 4px solid #4CAF50;
         }
-        .history-section {
-            margin-top: 30px;
-            border-top: 2px solid #eee;
-            padding-top: 20px;
-        }
-        .history-list {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin: 10px 0;
-        }
-        .history-item {
-            padding: 8px;
-            margin: 5px 0;
-            background-color: #f9f9f9;
-            border-left: 4px solid #4CAF50;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .history-item:hover {
-            background-color: #f1f1f1;
-        }
-        .export-buttons {
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>多語言文字辨識轉表格工具</h1>
+        <h1>文字與數字辨識工具</h1>
         
         <div class="input-section">
             <div>
@@ -102,17 +71,7 @@
         </div>
 
         <div id="processingStatus">等待操作...</div>
-        <table class="result-table" id="resultTable"></table>
-
-        <div class="history-section">
-            <h3>歷史記錄</h3>
-            <button onclick="clearHistory()">清除記錄</button>
-            <div class="history-list" id="historyList"></div>
-            <div class="export-buttons">
-                <button onclick="exportCSV()">匯出CSV</button>
-                <button onclick="exportJSON()">匯出JSON</button>
-            </div>
-        </div>
+        <pre id="resultText"></pre>
     </div>
 
     <script>
@@ -121,8 +80,7 @@
         const imagePreview = document.getElementById('imagePreview');
         const fileInput = document.getElementById('fileInput');
         const statusDiv = document.getElementById('processingStatus');
-        const resultTable = document.getElementById('resultTable');
-        let historyData = [];
+        const resultText = document.getElementById('resultText');
 
         // 啟動相機
         async function startCamera() {
@@ -167,7 +125,7 @@
         // 圖片處理核心邏輯
         async function processImage(imageSource) {
             statusDiv.innerHTML = '正在分析圖片...';
-            resultTable.innerHTML = '';
+            resultText.innerHTML = '';
 
             try {
                 const worker = await Tesseract.createWorker({
@@ -175,156 +133,29 @@
                     errorHandler: err => console.error(err)
                 });
 
-                // 多語言設定
+                // 設定僅識別文字和數字
                 await worker.loadLanguage('chi_tra+eng');
                 await worker.initialize('chi_tra+eng');
                 
                 // 優化OCR參數
                 await worker.setParameters({
-                    tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ·・　（）()%：:％、，.。繁體中文',
+                    tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
                     preserve_interword_spaces: '1',
                     tessjs_create_hocr: '0',
-                    classify_bln_numeric_mode: '1',
-                    tessedit_char_blacklist: 'Oo'
+                    classify_bln_numeric_mode: '1'
                 });
 
                 const { data: { text } } = await worker.recognize(imageSource);
                 
-                // 顯示原始識別結果用於調試
-                console.log('原始識別結果:', text);
-                
-                // 進階表格解析
-                const rows = text.split('\n').filter(row => row.trim() !== '');
-                const tableData = [];
-                let maxColumns = 0;
-
-                rows.forEach(row => {
-                    const cells = row.split(/(\s{2,}|│|\|)/)
-                        .filter(c => c.trim())
-                        .map(c => c.replace(/[│|]/g, '').trim());
-                    if (cells.length > 0) {
-                        tableData.push(cells);
-                        if (cells.length > maxColumns) {
-                            maxColumns = cells.length;
-                        }
-                    }
-                });
-
-                // 生成表格HTML
-                renderTable(tableData);
-
-                // 保存歷史記錄
-                const timestamp = new Date().toLocaleString('zh-TW');
-                historyData.unshift({
-                    timestamp,
-                    data: tableData
-                });
-                
-                // 保留最多50條記錄
-                if (historyData.length > 50) historyData.pop();
-                
-                saveHistory();
-                renderHistory();
-
-                statusDiv.innerHTML = `分析完成！共處理 ${tableData.length} 行資料`;
+                // 顯示識別結果
+                resultText.innerHTML = text;
+                statusDiv.innerHTML = '分析完成！';
                 
                 await worker.terminate();
             } catch (err) {
                 statusDiv.innerHTML = '處理失敗: ' + err.message;
             }
         }
-
-        // 渲染表格
-        function renderTable(data) {
-            let tableHTML = '';
-            data.forEach((row, index) => {
-                if (index === 0) {
-                    // 表頭
-                    tableHTML += '<thead><tr>';
-                    row.forEach(cell => {
-                        tableHTML += `<th>${cell}</th>`;
-                    });
-                    tableHTML += '</tr></thead><tbody>';
-                } else {
-                    // 表體
-                    tableHTML += '<tr>';
-                    row.forEach(cell => {
-                        tableHTML += `<td>${cell}</td>`;
-                    });
-                    tableHTML += '</tr>';
-                }
-            });
-            tableHTML += '</tbody>';
-            resultTable.innerHTML = tableHTML;
-        }
-
-        // 保存記錄到localStorage
-        function saveHistory() {
-            localStorage.setItem('ocrHistory', JSON.stringify(historyData));
-        }
-
-        // 載入歷史記錄
-        function loadHistory() {
-            const saved = localStorage.getItem('ocrHistory');
-            if (saved) {
-                historyData = JSON.parse(saved);
-                renderHistory();
-            }
-        }
-
-        // 渲染歷史記錄列表
-        function renderHistory() {
-            const container = document.getElementById('historyList');
-            container.innerHTML = historyData.map((record, index) => `
-                <div class="history-item" onclick="showRecord(${index})">
-                    ${record.timestamp} - ${record.data.length} 行數據
-                </div>
-            `).join('');
-        }
-
-        // 顯示指定記錄
-        function showRecord(index) {
-            const record = historyData[index];
-            renderTable(record.data);
-        }
-
-        // 清除歷史記錄
-        function clearHistory() {
-            historyData = [];
-            saveHistory();
-            renderHistory();
-            resultTable.innerHTML = '';
-        }
-
-        // 匯出CSV
-        function exportCSV() {
-            const csvContent = historyData.map(record => 
-                record.data.map(row => 
-                    row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')
-                ).join('\n')
-            ).join('\n\n');
-            
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `ocr_export_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
-        }
-
-        // 匯出JSON
-        function exportJSON() {
-            const jsonString = JSON.stringify(historyData, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `ocr_export_${new Date().toISOString().slice(0,10)}.json`;
-            link.click();
-        }
-
-        // 初始化時載入歷史記錄
-        document.addEventListener('DOMContentLoaded', () => {
-            loadHistory();
-        });
     </script>
 </body>
 </html>
