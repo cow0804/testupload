@@ -88,52 +88,39 @@
             }
         });
 
-        async function processImage() {
-            const file = imageInput.files[0];
-            if (!file) {
-                alert('請先選擇圖片');
-                return;
+       async function processImage() {
+    const file = imageInput.files[0];
+    if (!file) {
+        alert('請先選擇圖片');
+        return;
+    }
+    tableBody.innerHTML = '<tr><td colspan="2">處理中，請稍候...</td></tr>';
+    try {
+        console.log('開始 OCR 處理');
+        const { data: { text } } = await Tesseract.recognize(
+            file,
+            'eng+chi_tra',
+            { logger: m => console.log(m.status, m.progress) }
+        );
+        console.log('OCR 完成:', text);
+        tableBody.innerHTML = '';
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        lines.forEach(line => {
+            const [key, value] = line.split(/[:：]/).map(item => item.trim());
+            if (key && value) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${key}</td><td>${value}</td>`;
+                tableBody.appendChild(row);
             }
-
-            try {
-                // 使用 Tesseract.js 進行 OCR
-                const { data: { text } } = await Tesseract.recognize(
-                    file,
-                    'eng+chi_tra',
-                    {
-                        logger: m => console.log(m)
-                    }
-                );
-
-                // 清空之前的表格內容
-                tableBody.innerHTML = '';
-
-                // 簡單的文字處理，將內容按行分割
-                const lines = text.split('\n').filter(line => line.trim() !== '');
-                
-                // 生成表格
-                lines.forEach(line => {
-                    const [key, value] = line.split(/[:：]/).map(item => item.trim());
-                    if (key && value) {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${key}</td>
-                            <td>${value}</td>
-                        `;
-                        tableBody.appendChild(row);
-                    }
-                });
-
-                if (tableBody.children.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="2">未檢測到有效的鍵值對內容</td></tr>';
-                }
-
-            } catch (error) {
-                console.error('處理錯誤:', error);
-                tableBody.innerHTML = '<tr><td colspan="2">處理圖片時發生錯誤</td></tr>';
-            }
+        });
+        if (tableBody.children.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="2">未檢測到有效內容</td></tr>';
         }
-
+    } catch (error) {
+        console.error('OCR 錯誤:', error);
+        tableBody.innerHTML = '<tr><td colspan="2">處理失敗: ' + error.message + '</td></tr>';
+    }
+}
         // 表格搜索功能
         function searchTable() {
             const filter = searchInput.value.toLowerCase();
