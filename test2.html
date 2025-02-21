@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>文字辨識轉表格工具</title>
+    <title>表格文字提取工具</title>
     <script src="https://unpkg.com/tesseract.js@v4.0.2/dist/tesseract.min.js"></script>
     <style>
         .container {
@@ -54,37 +54,11 @@
             background-color: #f8f8f8;
             border-left: 4px solid #4CAF50;
         }
-        .history-section {
-            margin-top: 30px;
-            border-top: 2px solid #eee;
-            padding-top: 20px;
-        }
-        .history-list {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin: 10px 0;
-        }
-        .history-item {
-            padding: 8px;
-            margin: 5px 0;
-            background-color: #f9f9f9;
-            border-left: 4px solid #4CAF50;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .history-item:hover {
-            background-color: #f1f1f1;
-        }
-        .export-buttons {
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>文字辨識轉表格工具</h1>
+        <h1>表格文字提取工具</h1>
         
         <div class="input-section">
             <div>
@@ -103,16 +77,6 @@
 
         <div id="processingStatus">等待操作...</div>
         <table class="result-table" id="resultTable"></table>
-
-        <div class="history-section">
-            <h3>歷史記錄</h3>
-            <button onclick="clearHistory()">清除記錄</button>
-            <div class="history-list" id="historyList"></div>
-            <div class="export-buttons">
-                <button onclick="exportCSV()">匯出CSV</button>
-                <button onclick="exportJSON()">匯出JSON</button>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -122,7 +86,6 @@
         const fileInput = document.getElementById('fileInput');
         const statusDiv = document.getElementById('processingStatus');
         const resultTable = document.getElementById('resultTable');
-        let historyData = [];
 
         // 啟動相機
         async function startCamera() {
@@ -164,9 +127,9 @@
             }
         });
 
-        // 圖片處理核心邏輯
+        // 改進的表格解析邏輯
         async function processImage(imageSource) {
-            statusDiv.innerHTML = '正在分析圖片...';
+            statusDiv.innerHTML = '正在分析表格結構...';
             resultTable.innerHTML = '';
 
             try {
@@ -175,156 +138,70 @@
                     errorHandler: err => console.error(err)
                 });
 
-                // 多語言設定
                 await worker.loadLanguage('eng');
                 await worker.initialize('eng');
                 
-                // 優化OCR參數
+                // 優化表格識別參數
                 await worker.setParameters({
-                    tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ·・　（）()%：:％、，.。繁體中文',
                     preserve_interword_spaces: '1',
-                    tessjs_create_hocr: '0',
-                    classify_bln_numeric_mode: '1',
-                    tessedit_char_blacklist: 'Oo'
+                    tessedit_pageseg_mode: '6',  // 啟用表格分析模式
+                    tessjs_create_tsv: '1'
                 });
 
                 const { data: { text } } = await worker.recognize(imageSource);
                 
-                // 顯示原始識別結果用於調試
-                console.log('原始識別結果:', text);
-                
-                // 進階表格解析
-                const rows = text.split('\n').filter(row => row.trim() !== '');
-                const tableData = [];
-                let maxColumns = 0;
-
-                rows.forEach(row => {
-                    const cells = row.split(/(\s{2,}|│|\|)/)
-                        .filter(c => c.trim())
-                        .map(c => c.replace(/[│|]/g, '').trim());
-                    if (cells.length > 0) {
-                        tableData.push(cells);
-                        if (cells.length > maxColumns) {
-                            maxColumns = cells.length;
-                        }
-                    }
-                });
-
-                // 生成表格HTML
+                // 改進表格解析算法
+                const tableData = parseStructuredText(text);
                 renderTable(tableData);
-
-                // 保存歷史記錄
-                const timestamp = new Date().toLocaleString('zh-TW');
-                historyData.unshift({
-                    timestamp,
-                    data: tableData
-                });
-                
-                // 保留最多50條記錄
-                if (historyData.length > 50) historyData.pop();
-                
-                saveHistory();
-                renderHistory();
-
-                statusDiv.innerHTML = `分析完成！共處理 ${tableData.length} 行資料`;
                 
                 await worker.terminate();
+                statusDiv.innerHTML = '表格解析完成！';
             } catch (err) {
                 statusDiv.innerHTML = '處理失敗: ' + err.message;
             }
         }
 
-        // 渲染表格
-        function renderTable(data) {
-            let tableHTML = '';
-            data.forEach((row, index) => {
-                if (index === 0) {
-                    // 表頭
-                    tableHTML += '<thead><tr>';
-                    row.forEach(cell => {
-                        tableHTML += `<th>${cell}</th>`;
-                    });
-                    tableHTML += '</tr></thead><tbody>';
-                } else {
-                    // 表體
-                    tableHTML += '<tr>';
-                    row.forEach(cell => {
-                        tableHTML += `<td>${cell}</td>`;
-                    });
-                    tableHTML += '</tr>';
-                }
+        // 結構化文本解析器
+        function parseStructuredText(text) {
+            const rows = text.split('\n').filter(row => row.trim() !== '');
+            const columnPatterns = [
+                { pattern: /\b[A-Z]{2}\s?\d{3}\b/, name: '航班號' },     // CX 907
+                { pattern: /\b\d{3}[A-Z]\b/, name: '位置' },           // 522R
+                { pattern: /\d{2}:\d{2}/, name: '時間' },              // 07:30
+                { pattern: /\d{2}\/[A-Z]{3}/, name: '日期' },         // 22/FEB
+                { pattern: /\b[A-Z]{3}\b/, name: '機場代碼' },        // MNL
+                { pattern: /\b\d{2}[A-Z]-[a-z]\b/, name: '飛機種類' }, // 33P-k
+                { name: '物品' },                                    // COMMISSARY
+                { name: '資訊' }                                     // BACK UP TOILET
+            ];
+
+            return rows.map(row => {
+                const cells = row.split(/(\s{2,}|(?=\b[A-Z]{3}\b))/g)
+                               .filter(c => c.trim());
+                               
+                return columnPatterns.map((col, index) => {
+                    const cell = cells[index] || '';
+                    // 自動匹配數據類型
+                    if (col.pattern && cell.match(col.pattern)) {
+                        return { value: cell, type: col.name };
+                    }
+                    return { value: cell, type: columnPatterns[index].name };
+                });
             });
-            tableHTML += '</tbody>';
-            resultTable.innerHTML = tableHTML;
         }
 
-        // 保存記錄到localStorage
-        function saveHistory() {
-            localStorage.setItem('ocrHistory', JSON.stringify(historyData));
-        }
-
-        // 載入歷史記錄
-        function loadHistory() {
-            const saved = localStorage.getItem('ocrHistory');
-            if (saved) {
-                historyData = JSON.parse(saved);
-                renderHistory();
-            }
-        }
-
-        // 渲染歷史記錄列表
-        function renderHistory() {
-            const container = document.getElementById('historyList');
-            container.innerHTML = historyData.map((record, index) => `
-                <div class="history-item" onclick="showRecord(${index})">
-                    ${record.timestamp} - ${record.data.length} 行數據
-                </div>
+        // 表格渲染器
+        function renderTable(data) {
+            const headers = data[0].map(col => `<th>${col.type}</th>`).join('');
+            const body = data.map(row => `
+                <tr>${row.map(cell => `<td>${cell.value}</td>`).join('')}</tr>
             `).join('');
-        }
 
-        // 顯示指定記錄
-        function showRecord(index) {
-            const record = historyData[index];
-            renderTable(record.data);
+            resultTable.innerHTML = `
+                <thead><tr>${headers}</tr></thead>
+                <tbody>${body}</tbody>
+            `;
         }
-
-        // 清除歷史記錄
-        function clearHistory() {
-            historyData = [];
-            saveHistory();
-            renderHistory();
-            resultTable.innerHTML = '';
-        }
-
-        // 匯出CSV
-        function exportCSV() {
-            const csvContent = historyData.map(record => 
-                record.data.map(row => 
-                    row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')
-                ).join('\n')
-            ).join('\n\n');
-            
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `ocr_export_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
-        }
-
-        // 匯出JSON
-        function exportJSON() {
-            const jsonString = JSON.stringify(historyData, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `ocr_export_${new Date().toISOString().slice(0,10)}.json`;
-            link.click();
-        }
-
-        // 初始化時載入歷史記錄
-        document.addEventListener('DOMContentLoaded', () => {
-            loadHistory();
-        });
     </script>
 </body>
 </html>
