@@ -3,28 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>圖片文字識別與表格生成</title>
+    <title>手機圖片文字識別與表格生成</title>
     <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
+            font-size: 16px;
         }
         #preview {
             max-width: 100%;
-            margin: 20px 0;
+            height: auto;
+            margin: 10px 0;
+            border: 1px solid #ccc;
         }
         table {
             border-collapse: collapse;
             width: 100%;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 6px;
             text-align: left;
+            word-break: break-word;
         }
         th {
             background-color: #f2f2f2;
@@ -32,22 +36,30 @@
         #loading {
             display: none;
             color: #666;
+            text-align: center;
+            margin: 10px 0;
+        }
+        #error {
+            color: red;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-    <h1>圖片文字識別與表格生成</h1>
+    <h1>圖片文字識別</h1>
+    <p>請上傳清晰的圖片，包含數字和英文</p>
     
-    <input type="file" id="imageInput" accept="image/*">
+    <input type="file" id="imageInput" accept="image/*" capture="camera">
     <img id="preview" alt="圖片預覽">
     <div id="loading">處理中，請稍候...</div>
-    
+    <div id="error"></div>
     <div id="result"></div>
 
     <script>
         const imageInput = document.getElementById('imageInput');
         const preview = document.getElementById('preview');
         const loading = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
         const result = document.getElementById('result');
 
         // 圖片預覽
@@ -59,24 +71,59 @@
             }
         });
 
+        // 圖片預處理函數（提高對比度）
+        function preprocessImage(img) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            // 簡單二值化處理
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                const brightness = (r + g + b) / 3;
+                const threshold = 128;
+                const value = brightness > threshold ? 255 : 0;
+                data[i] = data[i + 1] = data[i + 2] = value;
+            }
+            ctx.putImageData(imageData, 0, 0);
+            return canvas;
+        }
+
         // 處理圖片並生成表格
         async function processImage(file) {
             loading.style.display = 'block';
+            errorDiv.innerHTML = '';
             result.innerHTML = '';
 
             try {
+                // 載入圖片進行預處理
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                await new Promise(resolve => img.onload = resolve);
+                const processedImage = preprocessImage(img);
+
                 // 使用 Tesseract 識別文字
                 const { data: { text } } = await Tesseract.recognize(
-                    file,
-                    'eng', // 語言設定為英文
+                    processedImage,
+                    'eng',
                     {
-                        tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ', // 只識別數字和英文
+                        tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ',
+                        psm: 6 // 假設文字為單一塊（可根據圖片調整）
                     }
                 );
 
                 // 將文字按行分割
                 const lines = text.split('\n').filter(line => line.trim() !== '');
-                
+                if (lines.length === 0) {
+                    throw new Error('無法識別圖片中的文字');
+                }
+
                 // 創建表格
                 let tableHTML = '<table><tr><th>內容</th></tr>';
                 lines.forEach(line => {
@@ -86,7 +133,7 @@
 
                 result.innerHTML = tableHTML;
             } catch (error) {
-                result.innerHTML = `<p style="color: red">錯誤：${error.message}</p>`;
+                errorDiv.innerHTML = `錯誤：${error.message}<br>請嘗試更清晰的圖片`;
             } finally {
                 loading.style.display = 'none';
             }
