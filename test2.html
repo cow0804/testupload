@@ -29,7 +29,7 @@
             position: absolute;
             border: 2px solid #4CAF50;
             background: rgba(76, 175, 80, 0.2);
-            pointer-events: none;
+            display: none;
         }
         .result-table {
             margin-top: 20px;
@@ -80,8 +80,8 @@
 
         <div class="preview-area" id="previewArea">
             <video id="videoPreview" autoplay></video>
-            <img id="imagePreview" src="#" alt="預覽圖片">
-            <div id="selectionBox" class="selection-box"></div>
+            <img id="imagePreview" src="#" alt="預覽圖片" onload="handleImageLoad()">
+            <div class="selection-box" id="selectionBox"></div>
         </div>
 
         <div id="processingStatus">等待操作...</div>
@@ -99,7 +99,7 @@
         const selectionBox = document.getElementById('selectionBox');
 
         let isSelecting = false;
-        let startX = 0, startY = 0, endX = 0, endY = 0;
+        let startX, startY, endX, endY;
 
         // 啟動相機
         async function startCamera(facingMode = 'environment') {
@@ -152,61 +152,63 @@
             }
         });
 
-        // 選取區域功能
-        previewArea.addEventListener('mousedown', (e) => {
-            if (imagePreview.style.display !== 'block') return;
+        // 圖片載入完成後處理
+        function handleImageLoad() {
+            if (imagePreview.width === 0 || imagePreview.height === 0) {
+                statusDiv.innerHTML = '錯誤：圖片尺寸為 0，請重新選擇圖片。';
+                return;
+            }
+            setupSelection();
+        }
 
-            isSelecting = true;
-            startX = e.offsetX;
-            startY = e.offsetY;
-            selectionBox.style.left = startX + 'px';
-            selectionBox.style.top = startY + 'px';
-            selectionBox.style.width = '0';
-            selectionBox.style.height = '0';
-            selectionBox.style.display = 'block';
-        });
+        // 設置選取區域
+        function setupSelection() {
+            previewArea.addEventListener('mousedown', (e) => {
+                isSelecting = true;
+                startX = e.offsetX;
+                startY = e.offsetY;
+                selectionBox.style.left = startX + 'px';
+                selectionBox.style.top = startY + 'px';
+                selectionBox.style.width = '0';
+                selectionBox.style.height = '0';
+                selectionBox.style.display = 'block';
+            });
 
-        previewArea.addEventListener('mousemove', (e) => {
-            if (!isSelecting) return;
+            previewArea.addEventListener('mousemove', (e) => {
+                if (isSelecting) {
+                    endX = e.offsetX;
+                    endY = e.offsetY;
+                    selectionBox.style.width = Math.abs(endX - startX) + 'px';
+                    selectionBox.style.height = Math.abs(endY - startY) + 'px';
+                    selectionBox.style.left = Math.min(startX, endX) + 'px';
+                    selectionBox.style.top = Math.min(startY, endY) + 'px';
+                }
+            });
 
-            endX = e.offsetX;
-            endY = e.offsetY;
-            selectionBox.style.width = Math.abs(endX - startX) + 'px';
-            selectionBox.style.height = Math.abs(endY - startY) + 'px';
-            selectionBox.style.left = Math.min(startX, endX) + 'px';
-            selectionBox.style.top = Math.min(startY, endY) + 'px';
-        });
-
-        previewArea.addEventListener('mouseup', () => {
-            if (!isSelecting) return;
-
-            isSelecting = false;
-            processSelectedArea();
-        });
+            previewArea.addEventListener('mouseup', () => {
+                isSelecting = false;
+                processSelectedArea();
+            });
+        }
 
         // 處理選取區域
         async function processSelectedArea() {
-            if (startX === endX || startY === endY) {
-                statusDiv.innerHTML = '請選擇有效的區域！';
-                return;
-            }
-
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            const rect = {
-                x: Math.min(startX, endX),
-                y: Math.min(startY, endY),
-                width: Math.abs(endX - startX),
-                height: Math.abs(endY - startY)
-            };
+            const rect = selectionBox.getBoundingClientRect();
+            const imgRect = imagePreview.getBoundingClientRect();
 
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-            ctx.drawImage(
-                imagePreview,
-                rect.x, rect.y, rect.width, rect.height,
-                0, 0, rect.width, rect.height
-            );
+            const scaleX = imagePreview.naturalWidth / imgRect.width;
+            const scaleY = imagePreview.naturalHeight / imgRect.height;
+
+            const x = (rect.left - imgRect.left) * scaleX;
+            const y = (rect.top - imgRect.top) * scaleY;
+            const width = rect.width * scaleX;
+            const height = rect.height * scaleY;
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(imagePreview, x, y, width, height, 0, 0, width, height);
 
             processImage(canvas);
         }
