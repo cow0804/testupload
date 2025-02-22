@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>手機圖片文字識別與表格生成</title>
+    <title>標籤文字識別與表格生成</title>
     <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
     <style>
         body {
@@ -46,8 +46,8 @@
     </style>
 </head>
 <body>
-    <h1>圖片文字識別</h1>
-    <p>請上傳清晰的圖片，包含數字和英文</p>
+    <h1>標籤文字識別</h1>
+    <p>請上傳清晰的標籤圖片，包含數字和英文</p>
     
     <input type="file" id="imageInput" accept="image/*" capture="camera">
     <img id="preview" alt="圖片預覽">
@@ -81,13 +81,13 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            // 簡單二值化處理
+            // 簡單二值化處理（針對綠色標籤和黑色文字）
             for (let i = 0; i < data.length; i += 4) {
                 const r = data[i];
                 const g = data[i + 1];
                 const b = data[i + 2];
                 const brightness = (r + g + b) / 3;
-                const threshold = 128;
+                const threshold = 150; // 根據標籤的綠色背景調整
                 const value = brightness > threshold ? 255 : 0;
                 data[i] = data[i + 1] = data[i + 2] = value;
             }
@@ -113,27 +113,53 @@
                     processedImage,
                     'eng',
                     {
-                        tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ',
-                        psm: 6 // 假設文字為單一塊（可根據圖片調整）
+                        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ -/:', // 包含特殊字符
+                        psm: 4 // 單行文字模式，適合標籤格式
                     }
                 );
 
-                // 將文字按行分割
-                const lines = text.split('\n').filter(line => line.trim() !== '');
+                // 清理和格式化文字
+                const lines = text.split('\n')
+                    .filter(line => line.trim() !== '')
+                    .map(line => line.trim().replace(/\s+/g, ' ')); // 清理多餘空格
+
                 if (lines.length === 0) {
                     throw new Error('無法識別圖片中的文字');
                 }
 
-                // 創建表格
-                let tableHTML = '<table><tr><th>內容</th></tr>';
-                lines.forEach(line => {
-                    tableHTML += `<tr><td>${line}</td></tr>`;
-                });
+                // 創建結構化表格
+                let tableHTML = '<table><tr><th>欄位 1</th><th>欄位 2</th><th>欄位 3</th><th>欄位 4</th></tr>';
+
+                // 處理第一行（CX 907 522R A）
+                if (lines[0]) {
+                    const firstLineParts = lines[0].split(/\s+/).filter(part => part !== '');
+                    tableHTML += `<tr>`;
+                    for (let i = 0; i < 4; i++) {
+                        tableHTML += `<td>${firstLineParts[i] || ''}</td>`;
+                    }
+                    tableHTML += `</tr>`;
+                }
+
+                // 處理第二行（07:30 22/FEB MNL 33P-K）
+                if (lines[1]) {
+                    const secondLineParts = lines[1].split(/\s+/).filter(part => part !== '');
+                    tableHTML += `<tr>`;
+                    for (let i = 0; i < 4; i++) {
+                        tableHTML += `<td>${secondLineParts[i] || ''}</td>`;
+                    }
+                    tableHTML += `</tr>`;
+                }
+
+                // 處理第三行（COMMISSARY BACK UP TOILET）
+                if (lines[2]) {
+                    tableHTML += `<tr><td colspan="4">${lines[2]}</td></tr>`;
+                }
+
                 tableHTML += '</table>';
 
                 result.innerHTML = tableHTML;
             } catch (error) {
-                errorDiv.innerHTML = `錯誤：${error.message}<br>請嘗試更清晰的圖片`;
+                errorDiv.innerHTML = `錯誤：${error.message}<br>請嘗試更清晰的圖片或調整角度`;
             } finally {
                 loading.style.display = 'none';
             }
