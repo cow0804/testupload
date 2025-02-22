@@ -1,197 +1,155 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>優化標籤文字識別</title>
-    <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+    <title>实时文字识别</title>
     <style>
         body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             font-family: Arial, sans-serif;
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 10px;
-            font-size: 16px;
         }
-        #preview {
-            max-width: 100%;
-            height: auto;
-            margin: 10px 0;
-            border: 1px solid #ccc;
+        #cameraPreview {
+            width: 100%;
+            max-width: 600px;
+            margin: 10px;
         }
         table {
-            border-collapse: collapse;
             width: 100%;
-            margin-top: 10px;
+            max-width: 600px;
+            border-collapse: collapse;
+            margin: 10px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 6px;
+            padding: 8px;
             text-align: left;
-            word-break: break-word;
         }
         th {
             background-color: #f2f2f2;
         }
-        #loading {
-            display: none;
-            color: #666;
-            text-align: center;
-            margin: 10px 0;
-        }
-        #error {
-            color: red;
-            margin: 10px 0;
-        }
-        #cameraButton {
-            display: block;
-            margin: 10px 0;
-            padding: 10px;
+        .button {
+            padding: 10px 20px;
+            margin: 10px;
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-        }
-        #cameraButton:hover {
-            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <h1>標籤文字識別</h1>
-    <p>點擊按鈕直接使用相機拍攝標籤，或選擇現有圖片</p>
+    <video id="cameraPreview" playsinline autoplay></video>
+    <div>
+        <button class="button" id="startButton">开始识别</button>
+        <button class="button" id="stopButton">停止识别</button>
+    </div>
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>识别内容</th>
+            </tr>
+        </thead>
+        <tbody id="results">
+        </tbody>
+    </table>
+
+    <!-- 引入Tesseract.js库 -->
+    <script src="https://unpkg.com/tesseract.js@v3.0.3/dist/tesseract.min.js"></script>
     
-    <button id="cameraButton">開啟相機拍攝</button>
-    <input type="file" id="imageInput" accept="image/*" capture="camera" style="display: none;">
-    <img id="preview" alt="圖片預覽">
-    <div id="loading">處理中，請稍候...</div>
-    <div id="error"></div>
-    <div id="result"></div>
-
     <script>
-        const cameraButton = document.getElementById('cameraButton');
-        const imageInput = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
-        const loading = document.getElementById('loading');
-        const errorDiv = document.getElementById('error');
-        const result = document.getElementById('result');
+        const video = document.getElementById('cameraPreview');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const resultsTbody = document.getElementById('results');
+        let isScanning = false;
+        let worker;
 
-        // 點擊按鈕觸發相機
-        cameraButton.addEventListener('click', () => {
-            imageInput.click();
+        // 初始化Tesseract
+        Tesseract.createWorker().then(w => {
+            worker = w;
+            return worker.load();
+        }).then(() => {
+            return worker.loadLanguage('eng+chi_sim');
+        }).then(() => {
+            return worker.initialize('eng+chi_sim');
         });
 
-        // 圖片選擇或相機回調
-        imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                preview.src = URL.createObjectURL(file);
-                processImage(file);
+        // 启动摄像头
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment',  // 使用后置摄像头
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error('摄像头访问失败:', err);
             }
-        });
+        }
 
-        // 進階圖片預處理函數
-        function preprocessImage(img) {
+        // 文字识别函数
+        async function recognizeText() {
+            if (!isScanning) return;
+
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-
-            // 灰度化處理並調整對比度
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-                const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b; // 灰度值
-                const contrast = (gray - 128) * 1.5 + 128; // 增加對比度
-                const value = Math.min(Math.max(contrast, 0), 255);
-                data[i] = data[i + 1] = data[i + 2] = value;
-            }
-            ctx.putImageData(imageData, 0, 0);
-
-            // 簡單二值化（針對綠色標籤和黑色文字）
-            const threshold = 140; // 根據測試調整
-            for (let i = 0; i < data.length; i += 4) {
-                const brightness = data[i];
-                data[i] = data[i + 1] = data[i + 2] = brightness > threshold ? 255 : 0;
-            }
-            ctx.putImageData(imageData, 0, 0);
-            return canvas;
-        }
-
-        // 處理圖片並生成表格
-        async function processImage(file) {
-            loading.style.display = 'block';
-            errorDiv.innerHTML = '';
-            result.innerHTML = '';
-
+            
+            // 设置画布尺寸与视频一致
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // 绘制当前视频帧
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
             try {
-                // 載入圖片進行預處理
-                const img = new Image();
-                img.src = URL.createObjectURL(file);
-                await new Promise(resolve => img.onload = resolve);
-                const processedImage = preprocessImage(img);
-
-                // 使用 Tesseract 識別文字
-                const { data: { text } } = await Tesseract.recognize(
-                    processedImage,
-                    'eng',
-                    {
-                        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ -/:', // 包含所有可能字符
-                        psm: 6 // 單塊文字模式，適合標籤
-                    }
-                );
-
-                // 清理和格式化文字
-                const lines = text.split('\n')
-                    .filter(line => line.trim() !== '')
-                    .map(line => line.trim().replace(/\s+/g, ' ')); // 清理多餘空格
-
-                if (lines.length === 0) {
-                    throw new Error('無法識別圖片中的文字');
+                const { data: { text } } = await worker.recognize(canvas);
+                if (text) {
+                    addToTable(text.trim());
                 }
+            } catch (err) {
+                console.error('识别错误:', err);
+            }
+            
+            requestAnimationFrame(recognizeText);
+        }
 
-                // 創建結構化表格
-                let tableHTML = '<table><tr><th>欄位 1</th><th>欄位 2</th><th>欄位 3</th><th>欄位 4</th></tr>';
-
-                // 處理第一行（CX 907 522R A）
-                if (lines[0]) {
-                    const firstLineParts = lines[0].split(/\s+/).filter(part => part !== '');
-                    tableHTML += `<tr>`;
-                    for (let i = 0; i < 4; i++) {
-                        tableHTML += `<td>${firstLineParts[i] || ''}</td>`;
-                    }
-                    tableHTML += `</tr>`;
-                }
-
-                // 處理第二行（07:30 22/FEB MNL 33P-K）
-                if (lines[1]) {
-                    const secondLineParts = lines[1].split(/\s+/).filter(part => part !== '');
-                    tableHTML += `<tr>`;
-                    for (let i = 0; i < 4; i++) {
-                        tableHTML += `<td>${secondLineParts[i] || ''}</td>`;
-                    }
-                    tableHTML += `</tr>`;
-                }
-
-                // 處理第三行（COMMISSARY BACK UP TOILET）
-                if (lines[2]) {
-                    tableHTML += `<tr><td colspan="4">${lines[2]}</td></tr>`;
-                }
-
-                tableHTML += '</table>';
-
-                result.innerHTML = tableHTML;
-            } catch (error) {
-                errorDiv.innerHTML = `錯誤：${error.message}<br>請嘗試更清晰的圖片、調整光線或角度`;
-            } finally {
-                loading.style.display = 'none';
+        // 添加结果到表格
+        function addToTable(text) {
+            const existing = Array.from(resultsTbody.children)
+                .some(row => row.cells[1].textContent === text);
+            
+            if (!existing) {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${resultsTbody.children.length + 1}</td>
+                    <td>${text}</td>
+                `;
+                resultsTbody.appendChild(newRow);
             }
         }
+
+        // 事件监听
+        startButton.addEventListener('click', () => {
+            if (!isScanning) {
+                isScanning = true;
+                recognizeText();
+            }
+        });
+
+        stopButton.addEventListener('click', () => {
+            isScanning = false;
+        });
+
+        // 初始化摄像头
+        startCamera();
     </script>
 </body>
 </html>
