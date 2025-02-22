@@ -81,20 +81,35 @@
 
         // 启动摄像头
         async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'environment',  // 使用后置摄像头
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    }
-                });
-                video.srcObject = stream;
-            } catch (err) {
-                console.error('摄像头访问失败:', err);
-            }
-        }
-
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    });
+    video.srcObject = stream;
+    
+    // 新增错误监听
+    video.onerror = (err) => {
+      console.error('视频流错误:', err);
+      alert('视频流异常，请刷新页面重试');
+    };
+    
+  } catch (err) {
+    console.error('摄像头错误:', err.name, err.message);
+    
+    // 分类处理常见错误
+    const errorMap = {
+      NotAllowedError: '请允许摄像头访问权限',
+      NotFoundError: '未找到可用摄像头',
+      OverconstrainedError: '无法满足分辨率要求'
+    };
+    
+    alert(errorMap[err.name] || `摄像头错误: ${err.message}`);
+  }
+}
         // 文字识别函数
         async function recognizeText() {
             if (!isScanning) return;
