@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>標籤文字識別與相機啟用</title>
+    <title>優化標籤文字識別</title>
     <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
     <style>
         body {
@@ -91,7 +91,7 @@
             }
         });
 
-        // 圖片預處理函數（提高對比度）
+        // 進階圖片預處理函數
         function preprocessImage(img) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -101,15 +101,23 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            // 簡單二值化處理（針對綠色標籤和黑色文字）
+            // 灰度化處理並調整對比度
             for (let i = 0; i < data.length; i += 4) {
                 const r = data[i];
                 const g = data[i + 1];
                 const b = data[i + 2];
-                const brightness = (r + g + b) / 3;
-                const threshold = 150; // 根據標籤的綠色背景調整
-                const value = brightness > threshold ? 255 : 0;
+                const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b; // 灰度值
+                const contrast = (gray - 128) * 1.5 + 128; // 增加對比度
+                const value = Math.min(Math.max(contrast, 0), 255);
                 data[i] = data[i + 1] = data[i + 2] = value;
+            }
+            ctx.putImageData(imageData, 0, 0);
+
+            // 簡單二值化（針對綠色標籤和黑色文字）
+            const threshold = 140; // 根據測試調整
+            for (let i = 0; i < data.length; i += 4) {
+                const brightness = data[i];
+                data[i] = data[i + 1] = data[i + 2] = brightness > threshold ? 255 : 0;
             }
             ctx.putImageData(imageData, 0, 0);
             return canvas;
@@ -133,8 +141,8 @@
                     processedImage,
                     'eng',
                     {
-                        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ -/:', // 包含特殊字符
-                        psm: 4 // 單行文字模式，適合標籤格式
+                        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ -/:', // 包含所有可能字符
+                        psm: 6 // 單塊文字模式，適合標籤
                     }
                 );
 
@@ -179,7 +187,7 @@
 
                 result.innerHTML = tableHTML;
             } catch (error) {
-                errorDiv.innerHTML = `錯誤：${error.message}<br>請嘗試更清晰的圖片或調整角度`;
+                errorDiv.innerHTML = `錯誤：${error.message}<br>請嘗試更清晰的圖片、調整光線或角度`;
             } finally {
                 loading.style.display = 'none';
             }
