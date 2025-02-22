@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>標籤文字識別與表格生成</title>
+    <title>標籤文字識別與相機啟用</title>
     <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
     <style>
         body {
@@ -43,26 +43,46 @@
             color: red;
             margin: 10px 0;
         }
+        #cameraButton {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #cameraButton:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <h1>標籤文字識別</h1>
-    <p>請上傳清晰的標籤圖片，包含數字和英文</p>
+    <p>點擊按鈕直接使用相機拍攝標籤，或選擇現有圖片</p>
     
-    <input type="file" id="imageInput" accept="image/*" capture="camera">
+    <button id="cameraButton">開啟相機拍攝</button>
+    <input type="file" id="imageInput" accept="image/*" capture="camera" style="display: none;">
     <img id="preview" alt="圖片預覽">
     <div id="loading">處理中，請稍候...</div>
     <div id="error"></div>
     <div id="result"></div>
 
     <script>
+        const cameraButton = document.getElementById('cameraButton');
         const imageInput = document.getElementById('imageInput');
         const preview = document.getElementById('preview');
         const loading = document.getElementById('loading');
         const errorDiv = document.getElementById('error');
         const result = document.getElementById('result');
 
-        // 圖片預覽
+        // 點擊按鈕觸發相機
+        cameraButton.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        // 圖片選擇或相機回調
         imageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
