@@ -1,9 +1,9 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>粵語語音 AI 聊天機械人</title>
+    <title>粵語語音 AI 聊天機械人 (DeepSeek)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,7 +45,7 @@
     </style>
 </head>
 <body>
-    <h1>粵語語音 AI 聊天機械人</h1>
+    <h1>粵語語音 AI 聊天機械人 (DeepSeek)</h1>
     <div id="chatbox"></div>
     <button onclick="startRecognition()">開始語音輸入</button>
 
@@ -54,10 +54,14 @@
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         const synth = window.speechSynthesis;
 
-        // 設置語音識別為粵語 (zh-HK)
+        // 設置語音識別為粵語
         recognition.lang = 'zh-HK';
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
+
+        // DeepSeek API 配置
+        const DEEPSEEK_API_KEY = 'sk-1e817d6ead4f4f1a81191dd60d6a5377'; // 請替換為你的 API Key
+        const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
         // 開始語音輸入
         function startRecognition() {
@@ -65,13 +69,13 @@
             addMessage('請講話...', 'bot');
         }
 
-        // 處理語音識別結果
-        recognition.onresult = function(event) {
+        // 處理語音識別結果並調用 DeepSeek API
+        recognition.onresult = async function(event) {
             const userSpeech = event.results[0][0].transcript;
             addMessage(userSpeech, 'user');
 
-            // 模擬 AI 回應 (這裡只是簡單回應，可替換為後端 API)
-            const botResponse = processInput(userSpeech);
+            // 調用 DeepSeek API 獲取回應
+            const botResponse = await getDeepSeekResponse(userSpeech);
             addMessage(botResponse, 'bot');
             speak(botResponse);
         };
@@ -80,14 +84,30 @@
             addMessage('語音識別出錯，請再試一次', 'bot');
         };
 
-        // 模擬處理輸入的函數
-        function processInput(input) {
-            if (input.includes('你好')) {
-                return '你好呀，有咩可以幫到你？';
-            } else if (input.includes('天氣')) {
-                return '今日天氣好好，陽光普照！';
-            } else {
-                return '唔好意思，我唔太明白你講咩，可以再試一次？';
+        // 調用 DeepSeek API 的函數
+        async function getDeepSeekResponse(input) {
+            try {
+                const response = await fetch(DEEPSEEK_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat', // 或 'deepseek-reasoner' 根據需求選擇
+                        messages: [
+                            { role: 'system', content: '你係一個會講粵語嘅助手，請用粵語回應。' },
+                            { role: 'user', content: input }
+                        ],
+                        stream: false
+                    })
+                });
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('DeepSeek API 錯誤:', error);
+                return '唔好意思，出現咗啲問題，請再試一次。';
             }
         }
 
@@ -103,7 +123,7 @@
         // 語音合成 (講出回應)
         function speak(text) {
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'zh-HK'; // 設置為粵語
+            utterance.lang = 'zh-HK';
             synth.speak(utterance);
         }
     </script>
