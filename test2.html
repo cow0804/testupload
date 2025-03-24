@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>粵語語音 AI 聊天機械人 (語音速度控制)</title>
+    <title>粵語語音 AI 聊天機械人 (按鍵錄音 + 語音速度控制)</title>
     <style>
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #f0f0f0; }
         #chatbox { width: 100%; max-width: 600px; height: 400px; border: 1px solid #ccc; overflow-y: auto; padding: 10px; background-color: white; margin-bottom: 20px; }
         .message { margin: 10px 0; padding: 8px; border-radius: 5px; }
         .user { background-color: #007bff; color: white; text-align: right; }
         .bot { background-color: #28a745; color: white; }
-        select, input { padding: 10px; font-size: 16px; margin: 10px; }
+        button, select, input { padding: 10px; font-size: 16px; margin: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>粵語語音 AI 聊天機械人 (語音速度控制)</h1>
+    <h1>粵語語音 AI 聊天機械人 (按鍵錄音 + 語音速度控制)</h1>
     <label for="roleSelect">選擇角色：</label>
     <select id="roleSelect" onchange="updateRole()">
         <option value="friend">朋友</option>
@@ -25,6 +25,7 @@
     <label for="speechRate">語音速度 (0.5 - 2.0):</label>
     <input type="range" id="speechRate" min="0.5" max="2.0" step="0.1" value="1.0" onchange="updateSpeechRate()">
     <span id="rateValue">1.0</span>
+    <button onclick="startRecognition()">開始語音輸入</button>
     <div id="chatbox"></div>
 
     <script>
@@ -38,7 +39,6 @@
         recognition.lang = 'zh-HK';
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
-        recognition.continuous = true;
 
         const DEEPSEEK_API_KEY = 'sk-1e817d6ead4f4f1a81191dd60d6a5377';
         const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
@@ -61,7 +61,6 @@
                 { role: 'system', content: roleConfig[selectedRole].prompt }
             ];
             addMessage(`已切換角色為：${roleSelect.options[roleSelect.selectedIndex].text}`, 'bot');
-            addMessage('請講話來同我傾計！', 'bot');
         }
 
         function updateSpeechRate() {
@@ -70,19 +69,16 @@
             addMessage(`語音速度已設為 ${currentSpeechRate.toFixed(1)}`, 'bot');
         }
 
-        recognition.start();
-        addMessage('語音監聽已啟動，請講話來同我傾計！', 'bot');
-
-        recognition.onend = function() {
-            console.log('語音識別結束，自動重啟...');
+        function startRecognition() {
             recognition.start();
-        };
+            addMessage('請講話...', 'bot');
+        }
 
         recognition.onresult = async function(event) {
             const userSpeech = event.results[0][0].transcript;
             addMessage(userSpeech, 'user');
 
-            // 直接發送至 DeepSeek
+            // 發送至 DeepSeek
             conversationHistory.push({ role: 'user', content: userSpeech });
             const botResponse = await getDeepSeekResponse();
             addMessage(botResponse, 'bot');
@@ -92,7 +88,7 @@
 
         recognition.onerror = function(event) {
             console.error('語音識別錯誤:', event.error);
-            addMessage('語音識別出錯，正在重試...', 'bot');
+            addMessage('語音識別出錯，請再試一次', 'bot');
         };
 
         async function getDeepSeekResponse() {
