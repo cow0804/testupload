@@ -52,33 +52,37 @@ async function addFlightData() {
 
     // 確保所有檢查都通過後才新增
     if (newData.length === sections.length * categories.length) {
+    if (newData.length === sections.length * categories.length) {
         flightDataArray.push(...newData);
 
-        // 自動上傳到 GitHub
         const updatedArrayString = "let flightDataArray = " + JSON.stringify(flightDataArray, null, 2) + ";";
-        const token = prompt("請輸入你的 GitHub Personal Access Token："); // 安全起見，應改進為安全輸入
+        const token = prompt("請輸入你的 GitHub Personal Access Token：");
         if (token) {
-            fetch(`https://api.github.com/repos/cow0804/testupload/data.js`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: "更新航班資料",
-                    content: btoa(unescape(encodeURIComponent(updatedArrayString))), // 將字串轉為 Base64
-                    sha: "<原始 data.js 的 SHA，需先獲取>" // 需先用 GET 請求獲取
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert("資料已成功上傳至 GitHub！");
-            })
-            .catch(error => {
-                alert("上傳失敗，請檢查 Token 或網路連線：" + error);
-            });
-        }
+            try {
+                const sha = await getFileSha(token, "<你的用戶名>", "<你的儲存庫名稱>", "data.js");
+                const updateResponse = await fetch(`https://api.github.com/repos/<你的用戶名>/<你的儲存庫名稱>/contents/data.js`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: "更新航班資料",
+                        content: btoa(unescape(encodeURIComponent(updatedArrayString))),
+                        sha: sha
+                    })
+                });
 
+                if (updateResponse.ok) {
+                    alert("資料已成功上傳至 GitHub！");
+                } else {
+                    const errorData = await updateResponse.json();
+                    alert("上傳失敗：" + errorData.message);
+                }
+            } catch (error) {
+                alert("上傳失敗：" + error.message);
+            }
+        }
         // 清空輸入欄位
         document.getElementById("new-flight").value = "";
         document.getElementById("new-type").value = "";
