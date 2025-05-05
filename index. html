@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>航班資料查詢</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>國泰航空航班資料查詢</h1>
+
+    <!-- 搜尋區域 -->
+    <div class="search-container">
+        <label for="flight-input">輸入航班號碼：</label>
+        <input type="text" id="flight-input" placeholder="例如：907">
+        <button onclick="searchFlight()">搜尋</button>
+    </div>
+
+    <!-- 搜尋結果 -->
+    <div id="search-result" class="result"></div>
+
+    <!-- 表格顯示所有資料 -->
+    <h2>所有航班資料</h2>
+    <table id="flight-table">
+        <thead>
+            <tr>
+                <th>航班號碼</th>
+                <th>機種/編號</th>
+                <th>Reg#</th>
+                <th>機艙/部門</th>
+                <th>頭車(F)</th>
+                <th>中車(M)</th>
+                <th>尾車(A)</th>
+                <th>長車</th>
+                <th>短車</th>
+                <th>焗爐</th>
+                <th>手挽</th>
+            </tr>
+        </thead>
+        <tbody id="flight-table-body"></tbody>
+    </table>
+
+    <script src="script.js"></script>
+</body>
+</html>
