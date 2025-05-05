@@ -69,29 +69,27 @@ h1, h2, h3 {
     display: none;
 }
 
-#flight-table {
-    width: 100%;
+.result table {
+    width: 80%;
+    margin: 0 auto;
     border-collapse: collapse;
-    margin-top: 20px;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-#flight-table th, #flight-table td {
+.result th, .result td {
     padding: 10px;
-    text-align: center;
     border: 1px solid #ddd;
+    text-align: center;
 }
 
-#flight-table th {
+.result th {
     background-color: #007bff;
     color: white;
 }
 
-#flight-table tr:nth-child(even) {
+.result tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-#flight-table tr:hover {
+.result tr:hover {
     background-color: #f1f1f1;
 }
