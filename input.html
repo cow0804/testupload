@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增航班資料</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>新增航班資料</h1>
+    <div class="input-container">
+        <label for="new-flight">航班號碼：</label>
+        <input type="text" id="new-flight" placeholder="例如：908"><br>
+        <label for="new-type">機型：</label>
+        <input type="text" id="new-type" placeholder="例如：HPE 32Q"><br>
+
+        <!-- 頭車表格 -->
+        <h3>頭車</h3>
+        <table class="input-table">
+            <thead>
+                <tr>
+                    <th>類別</th>
+                    <th>廚房</th>
+                    <th>酒倉</th>
+                    <th>老㩒</th>
+                    <th>水吧</th>
+                    <th>總數</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>長車</td>
+                    <td><input type="number" class="head-long-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="head-long-bar" min="0" value="0"></td>
+                    <td><input type="number" class="head-long-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="head-long-water" min="0" value="0"></td>
+                    <td><input type="number" class="head-long-total" min="0" value="0"></td>
+                </tr>
+                <tr>
+                    <td>短車</td>
+                    <td><input type="number" class="head-short-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="head-short-bar" min="0" value="0"></td>
+                    <td><input type="number" class="head-short-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="head-short-water" min="0" value="0"></td>
+                    <td><input type="number" class="head-short-total" min="0" value="0"></td>
+                </tr>
+                <tr>
+                    <td>焗爐</td>
+                    <td><input type="number" class="head-oven-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="head-oven-bar" min="0" value="0"></td>
+                    <td><input type="number" class="head-oven-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="head-oven-water" min="0" value="0"></td>
+                    <td><input type="number" class="head-oven-total" min="0" value="0"></td>
+                </tr>
+                <tr>
+                    <td>手挽</td>
+                    <td><input type="number" class="head-hand-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="head-hand-bar" min="0" value="0"></td>
+                    <td><input type="number" class="head-hand-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="head-hand-water" min="0" value="0"></td>
+                    <td><input type="number" class="head-hand-total" min="0" value="0"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 中車表格 -->
+        <h3>中車</h3>
+        <table class="input-table">
+            <thead>
+                <tr>
+                    <th>類別</th>
+                    <th>廚房</th>
+                    <th>酒倉</th>
+                    <th>老㩒</th>
+                    <th>水吧</th>
+                    <th>總數</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>長車</td>
+                    <td><input type="number" class="middle-long-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="middle-long-bar" min="0" value="0"></td>
+                    <td><input type="number" class="middle-long-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="middle-long-water" min="0" value="0"></td>
+                    <td><input type="number" class="middle-long-total" min="0" value="0"></td>
+                </tr>
+                <tr>
+                    <td>短車</td>
+                    <td><input type="number" class="middle-short-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="middle-short-bar" min="0" value="0"></td>
+                    <td><input type="number" class="middle-short-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="middle-short-water" min="0" value="0"></td>
+                    <td><input type="number" class="middle-short-total" min="0" value="0"></td>
+                </tr>
+                <tr>
+                    <td>焗爐</td>
+                    <td><input type="number" class="middle-oven-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="middle-oven-bar" min="0" value="0"></td>
+                    <td><input type="number" class="middle-oven-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="middle-oven-water" min="0" value="0"></td>
+                    <td><input type="number" class="middle-oven-total" min="0" value="0"></td>
+                </tr>
+                <tr>
+                    <td>手挽</td>
+                    <td><input type="number" class="middle-hand-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="middle-hand-bar" min="0" value="0"></td>
+                    <td><input type="number" class="middle-hand-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="middle-hand-water" min="0" value="0"></td>
+                    <td><input type="number" class="middle-hand-total" min="0" value="0"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 尾車表格 -->
+        <h3>尾車</h3>
+        <table class="input-table">
+            <thead>
+                <tr>
+                    <th>類別</th>
+                    <th>廚房</th>
+                    <th>酒倉</th>
+                    <th>老㩒</th>
+                    <th>水吧</th>
+                    <th>總數</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>長車</td>
+                    <td><input type="number" class="tail-long-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="tail-long-bar" min="0" value="0"></td>
+                    <td><input type="number" class="tail-long-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="tail-long-water" min="0" value="0"></td>
+                    <td><input type="number" class="tail-long-total" min="0" value="0"></td>
+                </tr>
+                <tr>
+                    <td>短車</td>
+                    <td><input type="number" class="tail-short-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="tail-short-bar" min="0" value="0"></td>
+                    <td><input type="number" class="tail-short-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="tail-short-water" min="0" value="0"></td>
+                    <td><input type="number" class="tail-short-total" min="0" value="0"></td>
+                </tr>
+                <tr>
+                    <td>焗爐</td>
+                    <td><input type="number" class="tail-oven-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="tail-oven-bar" min="0" value="0"></td>
+                    <td><input type="number" class="tail-oven-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="tail-oven-water" min="0" value="0"></td>
+                    <td><input type="number" class="tail-oven-total" min="0" value="0"></td>
+                </tr>
+                <tr>
+                    <td>手挽</td>
+                    <td><input type="number" class="tail-hand-kitchen" min="0" value="0"></td>
+                    <td><input type="number" class="tail-hand-bar" min="0" value="0"></td>
+                    <td><input type="number" class="tail-hand-elderly" min="0" value="0"></td>
+                    <td><input type="number" class="tail-hand-water" min="0" value="0"></td>
+                    <td><input type="number" class="tail-hand-total" min="0" value="0"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button onclick="addFlightData()">新增資料</button>
+        <a href="index.html"><button>返回主頁</button></a>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="input.js"></script>
+</body>
+</html>
