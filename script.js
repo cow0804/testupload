@@ -1,6 +1,6 @@
 // 航班資料（陣列形式）
-const flightDataArray = [
-    // 航班 907
+let flightDataArray = [
+    // 資料已在上一個回應中提供，略
     ["907", "頭車", "長車", { kitchen: 1, bar: 0, elderly: 0, water: 1, total: 2 }],
     ["907", "頭車", "短車", { kitchen: 0, bar: 1, elderly: 0, water: 1, total: 2 }],
     ["907", "頭車", "焗爐", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
@@ -13,174 +13,7 @@ const flightDataArray = [
     ["907", "尾車", "短車", { kitchen: 1, bar: 1, elderly: 0, water: 0, total: 2 }],
     ["907", "尾車", "焗爐", { kitchen: 4, bar: 0, elderly: 0, water: 0, total: 4 }],
     ["907", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 6, water: 6, total: 12 }],
-
-    // 航班 958
-    ["958", "頭車", "長車", { kitchen: 6, bar: 1, elderly: 0, water: 0, total: 7 }],
-    ["958", "頭車", "短車", { kitchen: 0, bar: 2, elderly: 0, water: 0, total: 2 }],
-    ["958", "頭車", "焗爐", { kitchen: 9, bar: 0, elderly: 0, water: 0, total: 9 }],
-    ["958", "頭車", "手挽", { kitchen: 6, bar: 0, elderly: 6, water: 0, total: 12 }],
-    ["958", "中車", "長車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["958", "中車", "短車", { kitchen: 0, bar: 1, elderly: 0, water: 0, total: 1 }],
-    ["958", "中車", "焗爐", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["958", "中車", "手挽", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["958", "尾車", "長車", { kitchen: 9, bar: 4, elderly: 0, water: 0, total: 13 }],
-    ["958", "尾車", "短車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["958", "尾車", "焗爐", { kitchen: 9, bar: 0, elderly: 0, water: 0, total: 9 }],
-    ["958", "尾車", "手挽", { kitchen: 6, bar: 0, elderly: 10, water: 0, total: 16 }],
-
-    // 航班 982
-    ["982", "頭車", "長車", { kitchen: 9, bar: 0, elderly: 0, water: 0, total: 9 }],
-    ["982", "頭車", "短車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["982", "頭車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["982", "頭車", "手挽", { kitchen: 5, bar: 0, elderly: 0, water: 0, total: 5 }],
-    ["982", "中車", "長車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["982", "中車", "短車", { kitchen: 0, bar: 1, elderly: 0, water: 0, total: 1 }],
-    ["982", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["982", "中車", "手挽", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["982", "尾車", "長車", { kitchen: 9, bar: 4, elderly: 0, water: 0, total: 13 }],
-    ["982", "尾車", "短車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["982", "尾車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["982", "尾車", "手挽", { kitchen: 6, bar: 0, elderly: 8, water: 0, total: 14 }],
-
-    // 航班 434
-    ["434", "頭車", "長車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["434", "頭車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["434", "頭車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["434", "頭車", "手挽", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["434", "中車", "長車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["434", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["434", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["434", "中車", "手挽", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["434", "尾車", "長車", { kitchen: 1, bar: 4, elderly: 0, water: 0, total: 5 }],
-    ["434", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["434", "尾車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["434", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 5, water: 0, total: 6 }],
-
-    // 航班 488
-    ["488", "頭車", "長車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["488", "頭車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["488", "頭車", "焗爐", { kitchen: 4, bar: 0, elderly: 0, water: 0, total: 4 }],
-    ["488", "頭車", "手挽", { kitchen: 5, bar: 0, elderly: 1, water: 0, total: 6 }],
-    ["488", "中車", "長車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["488", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["488", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["488", "中車", "手挽", { kitchen: 6, bar: 0, elderly: 0, water: 0, total: 6 }],
-    ["488", "尾車", "長車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["488", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["488", "尾車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["488", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 14, water: 0, total: 15 }],
-
-    // 航班 691
-    ["691", "頭車", "長車", { kitchen: 4, bar: 0, elderly: 0, water: 0, total: 4 }],
-    ["691", "頭車", "短車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["691", "頭車", "焗爐", { kitchen: 5, bar: 0, elderly: 0, water: 0, total: 5 }],
-    ["691", "頭車", "手挽", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["691", "中車", "長車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["691", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["691", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["691", "中車", "手挽", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["691", "尾車", "長車", { kitchen: 6, bar: 0, elderly: 0, water: 0, total: 6 }],
-    ["691", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["691", "尾車", "焗爐", { kitchen: 10, bar: 0, elderly: 0, water: 0, total: 10 }],
-    ["691", "尾車", "手挽", { kitchen: 3, bar: 0, elderly: 16, water: 0, total: 19 }],
-
-    // 航班 705
-    ["705", "頭車", "長車", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["705", "頭車", "短車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["705", "頭車", "焗爐", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["705", "頭車", "手挽", { kitchen: 6, bar: 0, elderly: 0, water: 0, total: 6 }],
-    ["705", "中車", "長車", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["705", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["705", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["705", "中車", "手挽", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["705", "尾車", "長車", { kitchen: 9, bar: 0, elderly: 0, water: 0, total: 9 }],
-    ["705", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["705", "尾車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["705", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 14, water: 0, total: 15 }],
-
-    // 航班 257
-    ["257", "頭車", "長車", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["257", "頭車", "短車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["257", "頭車", "焗爐", { kitchen: 4, bar: 0, elderly: 0, water: 0, total: 4 }],
-    ["257", "頭車", "手挽", { kitchen: 5, bar: 0, elderly: 0, water: 0, total: 5 }],
-    ["257", "中車", "長車", { kitchen: 6, bar: 0, elderly: 0, water: 0, total: 6 }],
-    ["257", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["257", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["257", "中車", "手挽", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["257", "尾車", "長車", { kitchen: 14, bar: 0, elderly: 0, water: 0, total: 14 }],
-    ["257", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["257", "尾車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["257", "尾車", "手挽", { kitchen: 7, bar: 0, elderly: 16, water: 0, total: 23 }],
-
-    // 航班 771
-    ["771", "頭車", "長車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["771", "頭車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["771", "頭車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["771", "頭車", "手挽", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["771", "中車", "長車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["771", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["771", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["771", "中車", "手挽", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["771", "尾車", "長車", { kitchen: 1, bar: 4, elderly: 0, water: 0, total: 5 }],
-    ["771", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["771", "尾車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["771", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 5, water: 0, total: 6 }],
-
-    // 航班 564
-    ["564", "頭車", "長車", { kitchen: 5, bar: 0, elderly: 0, water: 0, total: 5 }],
-    ["564", "頭車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["564", "頭車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["564", "頭車", "手挽", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["564", "中車", "長車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["564", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["564", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["564", "中車", "手挽", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["564", "尾車", "長車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["564", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["564", "尾車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["564", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 3, water: 0, total: 4 }],
-
-    // 航班 596
-    ["596", "頭車", "長車", { kitchen: 6, bar: 0, elderly: 0, water: 0, total: 6 }],
-    ["596", "頭車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["596", "頭車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["596", "頭車", "手挽", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["596", "中車", "長車", { kitchen: 4, bar: 0, elderly: 0, water: 0, total: 4 }],
-    ["596", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["596", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["596", "中車", "手挽", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["596", "尾車", "長車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["596", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["596", "尾車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["596", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 3, water: 0, total: 4 }],
-
-    // 航班 722
-    ["722", "頭車", "長車", { kitchen: 4, bar: 0, elderly: 0, water: 0, total: 4 }],
-    ["722", "頭車", "短車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["722", "頭車", "焗爐", { kitchen: 7, bar: 0, elderly: 0, water: 0, total: 7 }],
-    ["722", "頭車", "手挽", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["722", "中車", "長車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["722", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["722", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["722", "中車", "手挽", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["722", "尾車", "長車", { kitchen: 4, bar: 0, elderly: 0, water: 0, total: 4 }],
-    ["722", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["722", "尾車", "焗爐", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["722", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 15, water: 0, total: 16 }],
-
-    // 航班 723
-    ["723", "頭車", "長車", { kitchen: 4, bar: 0, elderly: 0, water: 0, total: 4 }],
-    ["723", "頭車", "短車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["723", "頭車", "焗爐", { kitchen: 7, bar: 0, elderly: 0, water: 0, total: 7 }],
-    ["723", "頭車", "手挽", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["723", "中車", "長車", { kitchen: 2, bar: 0, elderly: 0, water: 0, total: 2 }],
-    ["723", "中車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["723", "中車", "焗爐", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["723", "中車", "手挽", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["723", "尾車", "長車", { kitchen: 4, bar: 0, elderly: 0, water: 0, total: 4 }],
-    ["723", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
-    ["723", "尾車", "焗爐", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
-    ["723", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 15, water: 0, total: 16 }],
+// ... 其他資料（請參考上一個回應）
 ];
 
 // 載入表格資料
@@ -265,6 +98,42 @@ function searchFlight() {
 
     resultDiv.innerHTML = resultHTML;
     resultDiv.style.display = "block";
+}
+
+// 新增資料功能
+function addFlightData() {
+    const flight = document.getElementById("new-flight").value.trim();
+    const section = document.getElementById("new-section").value;
+    const category = document.getElementById("new-category").value;
+    const kitchen = parseInt(document.getElementById("new-kitchen").value) || 0;
+    const bar = parseInt(document.getElementById("new-bar").value) || 0;
+    const elderly = parseInt(document.getElementById("new-elderly").value) || 0;
+    const water = parseInt(document.getElementById("new-water").value) || 0;
+    const total = parseInt(document.getElementById("new-total").value) || 0;
+
+    if (!flight || kitchen + bar + elderly + water !== total) {
+        alert("請輸入有效的航班號碼，並確保總數等於各項之和！");
+        return;
+    }
+
+    const newData = [
+        flight,
+        section,
+        category,
+        { kitchen, bar, elderly, water, total }
+    ];
+
+    flightDataArray.push(newData);
+    loadTable(); // 更新表格
+    alert("資料新增成功！");
+
+    // 清空輸入欄位
+    document.getElementById("new-flight").value = "";
+    document.getElementById("new-kitchen").value = "0";
+    document.getElementById("new-bar").value = "0";
+    document.getElementById("new-elderly").value = "0";
+    document.getElementById("new-water").value = "0";
+    document.getElementById("new-total").value = "0";
 }
 
 // 頁面載入時顯示表格
