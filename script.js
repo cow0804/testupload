@@ -1,7 +1,5 @@
 // 航班資料（陣列形式）
 const flightDataArray = [
-    // 資料已在上方提供
-    const flightDataArray = [
     // 航班 907
     ["907", "頭車", "長車", { kitchen: 1, bar: 0, elderly: 0, water: 1, total: 2 }],
     ["907", "頭車", "短車", { kitchen: 0, bar: 1, elderly: 0, water: 1, total: 2 }],
@@ -183,7 +181,6 @@ const flightDataArray = [
     ["723", "尾車", "短車", { kitchen: 1, bar: 0, elderly: 0, water: 0, total: 1 }],
     ["723", "尾車", "焗爐", { kitchen: 3, bar: 0, elderly: 0, water: 0, total: 3 }],
     ["723", "尾車", "手挽", { kitchen: 1, bar: 0, elderly: 15, water: 0, total: 16 }],
-];
 ];
 
 // 載入表格資料
