@@ -1,5 +1,13 @@
 // input.js
-function addFlightData() {
+async function getFileSha(token, owner, repo, path) {
+    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+        headers: { 'Authorization': `token ${token}` }
+    });
+    const data = await response.json();
+    return data.sha;
+}
+
+async function addFlightData() {
     const flight = document.getElementById("new-flight").value.trim();
     const type = document.getElementById("new-type").value.trim();
 
