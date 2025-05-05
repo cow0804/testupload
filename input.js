@@ -50,7 +50,7 @@ function addFlightData() {
         const updatedArrayString = "let flightDataArray = " + JSON.stringify(flightDataArray, null, 2) + ";";
         const token = prompt("請輸入你的 GitHub Personal Access Token："); // 安全起見，應改進為安全輸入
         if (token) {
-            fetch(`https://api.github.com/repos/cow0804/testupload/contents/data.js`, {
+            fetch(`https://api.github.com/repos/cow0804/testupload/data.js`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${token}`,
