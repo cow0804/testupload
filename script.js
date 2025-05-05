@@ -1,27 +1,4 @@
 // script.js
-// 載入表格資料
-function loadTable() {
-    const tableBody = document.getElementById("flight-table-body");
-    tableBody.innerHTML = ""; // 清空表格
-
-    flightDataArray.forEach(data => {
-        const [flight, type, section, category, details] = data;
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${flight}</td>
-            <td>${type}</td>
-            <td>${section}</td>
-            <td>${category}</td>
-            <td>${details.kitchen || ""}</td>
-            <td>${details.bar || ""}</td>
-            <td>${details.elderly || ""}</td>
-            <td>${details.water || ""}</td>
-            <td>${details.total || 0}</td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-
 // 搜尋功能
 function searchFlight() {
     const flightNumber = document.getElementById("flight-input").value.trim();
@@ -84,6 +61,3 @@ function searchFlight() {
     resultDiv.innerHTML = resultHTML;
     resultDiv.style.display = "block";
 }
-
-// 頁面載入時顯示表格
-window.onload = loadTable;
