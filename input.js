@@ -1,4 +1,3 @@
-
 // input.js
 function addFlightData() {
     const flight = document.getElementById("new-flight").value.trim();
@@ -49,9 +48,9 @@ function addFlightData() {
 
         // 自動上傳到 GitHub
         const updatedArrayString = "let flightDataArray = " + JSON.stringify(flightDataArray, null, 2) + ";";
-        const token = prompt("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"); // 安全起見，應改進為安全輸入
+        const token = prompt("請輸入你的 GitHub Personal Access Token："); // 安全起見，應改進為安全輸入
         if (token) {
-            fetch(`https://api.github.com/repos/<你的用戶名>/<你的儲存庫名稱>/contents/data.js`, {
+            fetch(`https://api.github.com/repos/cow0804/testupload/contents/data.js`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${token}`,
