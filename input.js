@@ -59,8 +59,8 @@ async function addFlightData() {
         const token = prompt("請輸入你的 GitHub Personal Access Token：");
         if (token) {
             try {
-                const sha = await getFileSha(token, "<你的用戶名>", "<你的儲存庫名稱>", "data.js");
-                const updateResponse = await fetch(`https://api.github.com/repos/<你的用戶名>/<你的儲存庫名稱>/contents/data.js`, {
+                const sha = await getFileSha(token, "cow0804", "testupload", "data.js");
+                const updateResponse = await fetch(`https://api.github.com/repos/cow0804/testupload/contents/data.js`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `token ${token}`,
