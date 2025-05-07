@@ -1,0 +1,182 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 10px;
+    padding: 0;
+    background-color: #f4f4f4;
+    font-size: 16px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+h3 {
+    font-size: 1.2em;
+    color: #333;
+}
+
+h4 {
+    font-size: 1em;
+    color: #555;
+    margin: 10px 0;
+}
+
+.search-container {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+}
+
+.search-container label {
+    font-size: 1em;
+    margin-right: 5px;
+}
+
+.search-container input {
+    padding: 8px;
+    font-size: 1em;
+    width: 60%;
+    max-width: 200px;
+    margin: 5px 0;
+}
+
+.search-container button {
+    padding: 8px 15px;
+    font-size: 1em;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-container button:hover {
+    background-color: #0056b3;
+}
+
+.result {
+    text-align: center;
+    margin: 10px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    display: none;
+}
+
+.result table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 0.9em;
+}
+
+.result th, .result td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.result th {
+    background-color: #007bff;
+    color: white;
+}
+
+.result tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.result tr:hover {
+    background-color: #f1f1f1;
+}
+/* 新增以下樣式到 styles.css */
+
+.input-container {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 10px;
+}
+
+.input-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 0.9em;
+}
+
+.input-table th, .input-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.input-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+.input-table input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+    text-align: center;
+}
+
+/* 響應式設計：適應小螢幕 */
+@media (max-width: 600px) {
+    .input-table {
+        font-size: 0.8em;
+    }
+    
+    .input-table th, .input-table td {
+        padding: 5px;
+    }
+    
+    .input-container label {
+        display: block;
+        margin-top: 10px;
+    }
+    
+    .input-container input[type="text"] {
+        width: 100%;
+        max-width: none;
+    }
+    
+    button {
+        width: 100%;
+        margin: 5px 0;
+        padding: 10px;
+    }
+}
+/* 響應式設計：適應小螢幕 */
+@media (max-width: 600px) {
+    body {
+        margin: 5px;
+    }
+
+    h1 {
+        font-size: 1.2em;
+    }
+
+    .search-container input {
+        width: 50%;
+        font-size: 0.9em;
+    }
+
+    .search-container button {
+        padding: 6px 10px;
+        font-size: 0.9em;
+    }
+
+    .result table {
+        font-size: 0.8em;
+    }
+
+    .result th, .result td {
+        padding: 5px;
+    }
+}
