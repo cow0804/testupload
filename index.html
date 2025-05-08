@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>航班餐車設備查詢系統</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        label {
+            width: 100px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input {
+            width: 150px;
+        }
+        select {
+            width: 200px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .results {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .no-results {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+        .section-title {
+            margin-top: 30px;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+        .info-message {
+            text-align: center;
+            color: #31708f;
+            background-color: #d9edf7;
+            border: 1px solid #bce8f1;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>航班餐車設備查詢系統</h1>
+    
+    <div class="search-container">
+        <div class="input-group">
+            <label for="flightNumber">航機編號:</label>
+            <input type="text" id="flightNumber" placeholder="例如: 723">
+            <button id="searchBtn">搜尋</button>
+        </div>
+        
+        <div class="input-group">
+            <label for="aircraftType">機型:</label>
+            <select id="aircraftType" disabled>
+                <option value="">請先輸入航機編號</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="results" id="results">
+        <p class="no-results">請輸入航機編號進行查詢</p>
+    </div>
+
+    <!-- 將數據分開儲存在獨立的JS檔案中 -->
+    <script src="flightData.js"></script>
+    
+    <script>
+        // DOM元素
+        const flightNumberInput = document.getElementById('flightNumber');
+        const aircraftTypeSelect = document.getElementById('aircraftType');
+        const searchBtn = document.getElementById('searchBtn');
+        const resultsDiv = document.getElementById('results');
+
+        // 事件監聽器
+        searchBtn.addEventListener('click', searchByFlightNumber);
+        aircraftTypeSelect.addEventListener('change', handleAircraftTypeChange);
+        flightNumberInput.addEventListener('input', updateAircraftTypeOptions);
+
+        // 根據航機編號搜尋
+        function searchByFlightNumber() {
+            const flightNumber = flightNumberInput.value.trim();
+            if (!flightNumber) {
+                alert('請輸入航機編號');
+                return;
+            }
+
+            const results = flightDataArray.filter(item => item[0] === flightNumber);
+            if (results.length === 0) {
+                showNoResults();
+                return;
+            }
+
+            // 獲取所有機型
+            const types = [...new Set(results.map(item => item[1]))];
+            
+            if (types.length === 1) {
+                // 只有一種機型，直接顯示結果
+                displayResults(results);
+            } else {
+                // 多種機型，顯示提示信息
+                showTypeSelectionPrompt(flightNumber, types);
+            }
+        }
+
+        // 處理機型選擇變化
+        function handleAircraftTypeChange() {
+            const flightNumber = flightNumberInput.value.trim();
+            const aircraftType = aircraftTypeSelect.value;
+            
+            if (!flightNumber || !aircraftType) {
+                return;
+            }
+
+            const results = flightDataArray.filter(item => 
+                item[0] === flightNumber && item[1] === aircraftType
+            );
+            
+            if (results.length === 0) {
+                showNoResults();
+                return;
+            }
+
+            displayResults(results);
+        }
+
+        // 更新機型下拉選項
+        function updateAircraftTypeOptions() {
+            const flightNumber = flightNumberInput.value.trim();
+            if (!flightNumber) {
+                aircraftTypeSelect.innerHTML = '<option value="">請先輸入航機編號</option>';
+                aircraftTypeSelect.disabled = true;
+                return;
+            }
+
+            const types = new Set();
+            flightDataArray.forEach(item => {
+                if (item[0] === flightNumber) {
+                    types.add(item[1]);
+                }
+            });
+
+            if (types.size === 0) {
+                aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
+                aircraftTypeSelect.disabled = true;
+            } else {
+                aircraftTypeSelect.innerHTML = '<option value="">請選擇機型</option>';
+                types.forEach(type => {
+                    aircraftTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                });
+                aircraftTypeSelect.disabled = false;
+            }
+        }
+
+        // 顯示無結果
+        function showNoResults() {
+            resultsDiv.innerHTML = '<p class="no-results">找不到符合條件的結果</p>';
+        }
+
+        // 顯示機型選擇提示
+        function showTypeSelectionPrompt(flightNumber, types) {
+            resultsDiv.innerHTML = `
+                <div class="info-message">
+                    <h3>航機編號: ${flightNumber}</h3>
+                    <p>此航機有 ${types.length} 種機型: ${types.join(', ')}</p>
+                    <p>請從下拉選單中選擇機型查看詳細資料</p>
+                </div>
+            `;
+        }
+
+        // 顯示結果
+        function displayResults(data) {
+            // 按車廂類型分組
+            const groupedByCar = {};
+            data.forEach(item => {
+                const carType = item[2]; // 頭車/中車/尾車
+                const equipmentType = item[3]; // 長車/短車/焗爐/手挽
+                const equipmentData = item[4]; // 設備數據
+                
+                if (!groupedByCar[carType]) {
+                    groupedByCar[carType] = {};
+                }
+                
+                groupedByCar[carType][equipmentType] = equipmentData;
+            });
+
+            // 生成HTML
+            let html = '';
+            
+            // 顯示基本信息
+            html += `<h3>航機編號: ${data[0][0]}</h3>`;
+            html += `<h3>機型: ${data[0][1]}</h3>`;
+            
+            // 為每個車廂類型創建表格
+            for (const carType in groupedByCar) {
+                html += `<h4 class="section-title">${carType}</h4>`;
+                html += `<table>
+                    <thead>
+                        <tr>
+                            <th>設備類型</th>
+                            <th>廚房</th>
+                            <th>酒吧</th>
+                            <th>長者</th>
+                            <th>水車</th>
+                            <th>總數</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                
+                for (const equipmentType in groupedByCar[carType]) {
+                    const equipment = groupedByCar[carType][equipmentType];
+                    html += `<tr>
+                        <td>${equipmentType}</td>
+                        <td>${equipment.kitchen}</td>
+                        <td>${equipment.bar}</td>
+                        <td>${equipment.elderly}</td>
+                        <td>${equipment.water}</td>
+                        <td>${equipment.total}</td>
+                    </tr>`;
+                }
+                
+                html += `</tbody></table>`;
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
