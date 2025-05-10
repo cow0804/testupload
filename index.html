@@ -152,25 +152,31 @@
         resultsDiv.innerHTML = '<p class="loading">搜尋中...</p>';
 
         setTimeout(() => {
-            const aircraftData = flightData[flightNumber];
-            if (!aircraftData) {
-                showNoResults();
-                aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
-                aircraftTypeSelect.disabled = true;
-                return;
-            }
+        if (typeof flightData === 'undefined') {
+            resultsDiv.innerHTML = '<p class="no-results">數據載入失敗，請檢查 flightData.js 是否正確載入</p>';
+            aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
+            aircraftTypeSelect.disabled = true;
+            return;
+        }
 
-            // 更新機型下拉選項
-            const types = Object.keys(aircraftData);
-            updateAircraftTypeOptions(types);
+        const aircraftData = flightData[flightNumber];
+        if (!aircraftData) {
+            showNoResults();
+            aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
+            aircraftTypeSelect.disabled = true;
+            return;
+        }
 
-            if (types.length === 1) {
-                displayResults(flightNumber, types[0]);
-                aircraftTypeSelect.value = types[0];
-            } else {
-                showTypeSelectionPrompt(flightNumber, types);
-            }
-        }, 300);
+        const types = Object.keys(aircraftData);
+        updateAircraftTypeOptions(types);
+
+        if (types.length === 1) {
+            displayResults(flightNumber, types[0]);
+            aircraftTypeSelect.value = types[0];
+        } else {
+            showTypeSelectionPrompt(flightNumber, types);
+        }
+    }, 300);
     }
 
     // 處理機型選擇變化
