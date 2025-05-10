@@ -97,6 +97,9 @@
     </style>
 </head>
 <body>
+<!-- 將數據分開儲存在獨立的JS檔案中 -->
+<script src="flightData.js" defer></script>  
+  
     <h1>航班餐車設備查詢系統</h1>
     
     <div class="search-container">
@@ -116,10 +119,7 @@
 <div class="results" id="results">
     <p class="no-results">請輸入航機編號進行查詢</p>
 </div>
-
-<!-- 將數據分開儲存在獨立的JS檔案中 -->
-<script src="flightData.js"></script>
-
+    
 <script>
     // 定義設備類型索引常量
     const EQUIPMENT_INDEX = {
