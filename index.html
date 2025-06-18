@@ -3,186 +3,490 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>航班餐車設備查詢系統</title>
+    <title>航班設備與餐車配置系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+        }
+        
+        :root {
+            --primary: #1a2a6c;
+            --secondary: #2c3e50;
+            --accent: #b21f1f;
+            --light: #f5f8fa;
+            --dark: #1e2a38;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FFC107;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h1 {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), #1a2a6c);
             color: #333;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        header {
             text-align: center;
-            margin-bottom: 30px;
-        }
-        .tab-container {
             margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
-        .tab-buttons {
-            display: flex;
+        
+        h1 {
+            color: var(--primary);
             margin-bottom: 10px;
+            font-size: 2.4rem;
         }
-        .tab-button {
-            padding: 10px 20px;
-            background-color: #e0e0e0;
+        
+        .subtitle {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        /* 输入区域样式 */
+        .input-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .form-control {
+            flex: 1;
+            min-width: 220px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.2);
+            outline: none;
+        }
+        
+        /* 标签页样式 */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50px;
+            padding: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-btn {
+            padding: 12px 30px;
+            background: none;
             border: none;
-            cursor: pointer;
             font-size: 16px;
-            margin-right: 5px;
-            border-radius: 5px 5px 0 0;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .tab-button.active {
-            background-color: #4CAF50;
+        
+        .tab-btn i {
+            font-size: 18px;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
             color: white;
+            box-shadow: 0 4px 10px rgba(26, 42, 108, 0.3);
         }
+        
+        .tab-btn:hover:not(.active) {
+            background: rgba(26, 42, 108, 0.1);
+        }
+        
         .tab-content {
             display: none;
-            background-color: white;
-            padding: 20px;
-            border-radius: 0 8px 8px 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease;
         }
+        
         .tab-content.active {
             display: block;
         }
-        .search-container {
-            margin-bottom: 15px;
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .input-group {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
+        
+        /* 设备查询结果样式 */
+        .results {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            min-height: 300px;
         }
-        label {
-            width: 100px;
-            font-weight: bold;
-        }
-        input, select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        input {
-            width: 150px;
-        }
-        select {
-            width: 200px;
-        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        
         th, td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: center;
         }
+        
         th {
             background-color: #f2f2f2;
             font-weight: bold;
+            color: var(--primary);
         }
-        .no-results {
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .no-results, .loading {
             text-align: center;
+            padding: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .no-results {
             color: #666;
             font-style: italic;
-            padding: 20px;
         }
+        
+        .loading {
+            color: var(--primary);
+        }
+        
         .section-title {
             margin-top: 30px;
-            color: #333;
-            border-bottom: 2px solid #4CAF50;
+            color: var(--primary);
+            border-bottom: 2px solid var(--success);
             padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .info-message {
-            text-align: center;
-            color: #31708f;
-            background-color: #d9edf7;
-            border: 1px solid #bce8f1;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .loading {
-            text-align: center;
-            color: #666;
+        
+        /* 餐车配置样式 */
+        .config-display {
+            background: rgba(255, 255, 255, 0.95);
             padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            min-height: 300px;
         }
-        .color-1 {
-            background-color: #add8e6; /* 淺藍色 */
+        
+        .car-section {
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
         }
-        .color-2 {
-            background-color: #ffb6c1; /* 淺粉色 */
+        
+        .car-header {
+            background: var(--primary);
+            color: white;
+            padding: 12px 18px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .color-3 {
-            background-color: white;/* 白色 */
+        
+        .area-section {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
         }
-        .color-4 {
-            background-color: red; /* 紅色 */
+        
+        .area-header {
+            color: var(--accent);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: space-between;
+        }
+        
+        .area-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .position-count {
+            background: var(--primary);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+        
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        
+        .position-card {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .position-card.extra {
+            border-left: 3px solid var(--accent);
+        }
+        
+        .position-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .position-id {
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        
+        .position-name {
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        
+        .position-color {
+            height: 12px;
+            width: 100%;
+            border-radius: 2px;
+            margin-top: 4px;
+        }
+        
+        .color-1 { background-color: #87CEEB; } /* 浅蓝 */
+        .color-2 { background-color: #FFB6C1; } /* 浅粉 */
+        .color-3 { background-color: #FFFFFF; border: 1px solid #ddd; } /* 白色 */
+        .color-4 { background-color: #FF6B6B; } /* 红色 */
+        
+        .welcome-section {
+            text-align: center;
+            padding: 30px 15px;
+            color: var(--primary);
+        }
+        
+        .welcome-section i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .welcome-section h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .welcome-section p {
+            max-width: 600px;
+            margin: 0 auto 15px;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.85);
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                flex-direction: column;
+            }
+            
+            .form-control {
+                width: 100%;
+            }
+            
+            .tab-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .position-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .position-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            
+            .position-card {
+                padding: 8px;
+            }
+            
+            .position-id {
+                font-size: 13px;
+            }
+            
+            .position-name {
+                font-size: 12px;
+            }
+            
+            header {
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .input-section, .results, .config-display {
+                padding: 15px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                border-radius: 12px;
+            }
+            
+            .tab-btn {
+                border-radius: 8px;
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>航班餐車設備查詢系統</h1>
-    
-    <div class="tab-container">
-        <div class="tab-buttons">
-            <button class="tab-button active" onclick="openTab('tab1')">設備數量查詢</button>
-            <button class="tab-button" onclick="openTab('tab2')">餐櫃位置查詢</button>
-        </div>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-plane"></i> 航班設備與餐車配置系统</h1>
+            <p class="subtitle">查詢航班設備與餐車配置</p>
+        </header>
         
-        <!-- 設備數量查詢 Tab -->
-        <div id="tab1" class="tab-content active">
-            <div class="search-container">
-                <div class="input-group">
-                    <label for="flightNumber">航機編號:</label>
+        <!-- 输入区域 - 独立于标签页 -->
+        <div class="input-section">
+            <div class="form-group">
+                <div class="form-control">
+                    <label for="flightNumber"><i class="fas fa-plane"></i> 航班編號</label>
                     <input type="text" id="flightNumber" placeholder="例如: 723">
                 </div>
-                <div class="input-group">
-                    <label for="aircraftType">機型:</label>
+                
+                <div class="form-control">
+                    <label for="aircraftType"><i class="fas fa-jet-fighter"></i> 選擇機型</label>
                     <select id="aircraftType" disabled>
-                        <option value="">請輸入航機編號</option>
+                        <option value="">請输入航班編號</option>
                     </select>
                 </div>
-            </div>
-            <div class="results" id="results">
-                <p class="no-results">請輸入航機編號進行查詢</p>
             </div>
         </div>
         
-        <!-- 位置配置查詢 Tab -->
-        <div id="tab2" class="tab-content">
-            <div class="search-container">
-                <div class="input-group">
-                    <label for="positionAircraftType">機型:</label>
-                    <select id="positionAircraftType">
-                        <option value="">-- 請選擇機型 --</option>
-                        <option value="33E">33E</option>
-                        <option value="33K">33K</option>
-                        <option value="33A">33A</option>
-                        <option value="33J">33J</option>
-                        <option value="33P">33P</option>
-                        <option value="33B">33B</option>
-                        <option value="35G">35G</option>
-                        <option value="35J">35J</option>
-                        <option value="77P">77P</option>
-                        <option value="77K">77K</option>
-                        <option value="77A">77A</option>
-                        <option value="77J">77J</option>
-
-                    </select>
+        <!-- 标签页导航 -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="total">
+                <i class="fas fa-search"></i> 設備查詢
+            </button>
+            <button class="tab-btn" data-tab="tray">
+                <i class="fas fa-utensils"></i> 餐車配置
+            </button>
+        </div>
+        
+        <!-- 设备查询页面 -->
+        <div id="total" class="tab-content active">
+            <div class="results" id="results">
+                <p class="no-results">請输入航班編號並選擇機型進行查詢</p>
+            </div>
+        </div>
+        
+        <!-- 餐车配置页面 -->
+        <div id="tray" class="tab-content">
+            <div class="config-display">
+                <div id="config-content">
+                    <div class="welcome-section">
+                        <i class="fas fa-utensils"></i>
+                        <h2>航班餐車配置系统</h2>
+                        <p>請输入航班編號並選擇機型查看餐車配置信息</p>
+                    </div>
                 </div>
             </div>
-            <div id="positionConfigDisplay" class="no-results">請從上方選擇機型以查看配置</div>
         </div>
+        
+        <footer>
+            <p>航班設備與餐車配置系统 &copy; 2025 | 疾風牛牛</p>
+        </footer>
     </div>
-
+    
     <script>
-// [kitchen, bar, elderly, water
-const flightData = {
+        // 设备查询数据
+        const flightData = {
     "139": {
     "35G": {
         "頭車": {
@@ -462,7 +766,6 @@ const flightData = {
                 "手挽": [1, 0, 8, 3]
             }
         },
-
         "33J": {
             "頭車": {
                 "長車": [3, 0, 0, 4],
@@ -481,6 +784,46 @@ const flightData = {
                 "短車": [0, 0, 0, 2],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [2, 2, 9, 3]
+            }
+        },
+        "33E": {
+            "頭車": {
+                "長車": [3, 1, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 1],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [1, 0, 4, 3]
+            },
+            "尾車": {
+                "長車": [8, 3, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 2, 9, 5]
+            }
+        },
+        "33K": {
+            "頭車": {
+                "長車": [3, 1, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 1],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [1, 0, 4, 3]
+            },
+            "尾車": {
+                "長車": [8, 4, 0, 2],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 2, 9, 5]
             }
         }
     },
@@ -501,6 +844,26 @@ const flightData = {
             "尾車": {
                 "長車": [8, 2, 0, 3],
                 "短車": [1, 3, 0, 3],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 3, 14, 7]
+            }
+        },
+        "35J": {
+            "頭車": {
+                "長車": [3, 2, 0, 1],
+                "短車": [0, 0, 1, 5],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 8, 6]
+            },
+            "中車": {
+                "長車": [4, 1, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 17, 10]
+            },
+            "尾車": {
+                "長車": [7, 3, 0, 4],
+                "短車": [1, 0, 0, 3],
                 "焗爐": [8, 0, 0, 0],
                 "手挽": [0, 3, 14, 7]
             }
@@ -547,6 +910,26 @@ const flightData = {
                 "手挽": [2, 2, 9, 5]
             }
         },
+        "33K": {
+            "頭車": {
+                "長車": [3, 1, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 1],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [2, 0, 4, 3]
+            },
+            "尾車": {
+                "長車": [9, 3, 0, 2],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 2, 9, 5]
+            }
+        },
         "33P": {
             "頭車": {
                 "長車": [3, 0, 0, 2],
@@ -569,6 +952,26 @@ const flightData = {
         }
     },
     "334": {
+        "77P": {
+            "頭車": {
+                "長車": [6, 1, 0, 2],
+                "短車": [0, 3, 2, 3],
+                "焗爐": [11, 0, 0, 0],
+                "手挽": [1, 0, 12, 7]
+            },
+            "中車": {
+                "長車": [4, 0, 0, 0],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [7, 0, 0, 0],
+                "手挽": [1, 4, 5, 1]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 1],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 8, 2]
+            }
+        },
         "77K": {
             "頭車": {
                 "長車": [4, 0, 0, 3],
@@ -591,24 +994,23 @@ const flightData = {
         },
         "77J": {
               "頭車": {
-                "長車": [4, 0, 0, 1],
-                "短車": [0, 4, 1, 2],
+                "長車": [5, 0, 0, 6],
+                "短車": [0, 4, 2, 5],
                 "焗爐": [6, 0, 0, 0],
-                "手挽": [3, 0, 19, 18]
+                "手挽": [3, 0, 19, 16]
             },
             "中車": {
                 "長車": [3, 2, 0, 0],
-                "短車": [1, 0, 0, 0],
+                "短車": [1, 0, 0, 1],
                 "焗爐": [5, 0, 0, 0],
                 "手挽": [0, 0, 8, 9]
             },
             "尾車": {
-                "長車": [7, 0, 0, 0],
-                "短車": [0, 2, 1, 0],
-                "焗爐": [6, 0, 0, 0],
-                "手挽": [0, 0, 13, 16]
+                "長車": [7, 0, 0, 6],
+                "短車": [0, 2, 0, 2],
+                "焗爐": [7, 0, 0, 0],
+                "手挽": [0, 3, 13, 16]
             }
-   
         }
     },
     "336": {
@@ -647,6 +1049,26 @@ const flightData = {
             },
             "尾車": {
                 "長車": [9, 3, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 2, 9, 5]
+            }
+        },
+        "33K": {
+            "頭車": {
+                "長車": [3, 1, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 1],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [2, 0, 4, 3]
+            },
+            "尾車": {
+                "長車": [9, 3, 0, 2],
                 "短車": [0, 0, 0, 2],
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [2, 2, 9, 5]
@@ -755,6 +1177,26 @@ const flightData = {
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [2, 2, 9, 5]
             }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [3, 0, 8, 6]
+            },
+            "尾車": {
+                "長車": [8, 2, 0, 2],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [1, 0, 8, 3]
+            }
         }
     },
     "356": {
@@ -781,7 +1223,7 @@ const flightData = {
         "33J": {
             "頭車": {
                 "長車": [3, 0, 0, 4],
-                "短車": [2, 0, 0, 1],
+                "短車": [0, 2, 0, 1],
                 "焗爐": [4, 0, 0, 0],
                 "手挽": [0, 0, 6, 3]
             },
@@ -796,6 +1238,46 @@ const flightData = {
                 "短車": [0, 0, 0, 2],
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [0, 2, 9, 3]
+            }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 0, 8, 6]
+            },
+            "尾車": {
+                "長車": [8, 2, 0, 2],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 8, 3]
+            }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [4, 1, 0, 0],
+                "短車": [0, 0, 0, 3],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 1, 7, 4]
+            },
+            "尾車": {
+                "長車": [7, 2, 0, 3],
+                "短車": [1, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [4, 0, 10, 6]
             }
         }
     },
@@ -926,6 +1408,26 @@ const flightData = {
                 "手挽": [2, 2, 9, 3]
             }
         },
+        "33B": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 3],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [3, 0, 8, 6]
+            },
+            "尾車": {
+                "長車": [8, 2, 0, 3],
+                "短車": [0, 4, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [1, 0, 8, 3]
+            }
+        },
         "33E": {
             "頭車": {
                 "長車": [3, 1, 0, 2],
@@ -944,6 +1446,46 @@ const flightData = {
                 "短車": [0, 0, 0, 2],
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [2, 2, 9, 5]
+            }
+        },
+        "33K": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 1],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [2, 0, 4, 3]
+            },
+            "尾車": {
+                "長車": [9, 3, 0, 2],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 2, 9, 5]
+            }
+        },
+        "35G": {
+            "頭車": {
+                "長車": [3, 2, 0, 1],
+                "短車": [0, 0, 1, 5],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 8, 6]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [2, 0, 15, 19]
+            },
+            "尾車": {
+                "長車": [8, 2, 0, 3],
+                "短車": [1, 3, 0, 3],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 3, 14, 7]
             }
         }
     },
@@ -966,6 +1508,26 @@ const flightData = {
                 "短車": [0, 0, 0, 2],
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [2, 2, 9, 5]
+            }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [3, 0, 8, 6]
+            },
+            "尾車": {
+                "長車": [8, 2, 0, 3],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [1, 0, 8, 3]
             }
         },
         "33J": {
@@ -1159,6 +1721,26 @@ const flightData = {
                 "手挽": [0, 2, 8, 5]
             }
         },
+        "33J": {
+            "頭車": {
+                "長車": [2, 0, 0, 4],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 1],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 1, 5, 4]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 2],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 2, 8, 3]
+            }
+        },
         "33B": {
             "頭車": {
                 "長車": [2, 0, 0, 2],
@@ -1200,6 +1782,26 @@ const flightData = {
                 "焗爐": [8, 0, 0, 0],
                 "手挽": [0, 3, 14, 8]
             }
+        },
+        "77P": {
+            "頭車": {
+                "長車": [14, 1, 0, 2],
+                "短車": [0, 6, 2, 4],
+                "焗爐": [11, 0, 0, 0],
+                "手挽": [0, 0, 13, 7]
+            },
+            "中車": {
+                "長車": [7, 0, 0, 2],
+                "短車": [2, 5, 0, 1],
+                "焗爐": [7, 0, 0, 0],
+                "手挽": [1, 5, 6, 1]
+            },
+            "尾車": {
+                "長車": [9, 1, 0, 0],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 8, 2]
+            }
         }
     },
     "416": {
@@ -1223,6 +1825,26 @@ const flightData = {
                 "手挽": [0, 3, 14, 7]
             }
         },
+        "33E": {
+            "頭車": {
+                "長車": [3, 0, 0, 4],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 1, 4, 4]
+            },
+            "尾車": {
+                "長車": [6, 3, 0, 1],
+                "短車": [0, 6, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 2, 10, 5]
+            }
+        },
         "33P": {
             "頭車": {
                 "長車": [3, 0, 0, 2],
@@ -1241,6 +1863,46 @@ const flightData = {
                 "短車": [0, 3, 0, 1],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [4, 0, 10, 6]
+            }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [1, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 0, 0, 2],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 8, 6]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 4],
+                "短車": [0, 4, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [1, 2, 8, 3]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [3, 0, 0, 4],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 1, 6, 4]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 4],
+                "短車": [0, 3, 0, 3],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [3, 2, 9, 3]
             }
         }
     },
@@ -1429,6 +2091,66 @@ const flightData = {
                 "焗爐": [4, 0, 0, 0],
                 "手挽": [1, 0, 6, 6]
             }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [2, 0, 0, 4],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 1],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 1, 5, 4]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 2],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 2, 8, 3]
+            }
+        },
+        "33K": {
+            "頭車": {
+                "長車": [2, 1, 0, 3],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 1, 4, 4]
+            },
+            "尾車": {
+                "長車": [6, 3, 0, 3],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 2, 8, 5]
+            }
+        },
+        "33E": {
+            "頭車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 1, 4, 4]
+            },
+            "尾車": {
+                "長車": [6, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 2, 8, 5]
+            }
         }
     },
     "432": {
@@ -1470,6 +2192,46 @@ const flightData = {
                 "短車": [0, 0, 0, 2],
                 "焗爐": [8, 0, 0, 0],
                 "手挽": [0, 2, 8, 5]
+            }
+        },
+        "33K": {
+            "頭車": {
+                "長車": [3, 1, 0, 3],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 1, 4, 4]
+            },
+            "尾車": {
+                "長車": [6, 3, 0, 3],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 2, 8, 5]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [2, 0, 0, 4],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 1],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 1, 5, 4]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 2],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 2, 8, 3]
             }
         }
     },
@@ -1518,6 +2280,26 @@ const flightData = {
         }
     },
     "458": {
+        "32Q": {
+            "頭車": {
+                "長車": [2, 0, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 2, 1]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 0, 0]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [1, 1, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 6, 6]
+            }
+        },
         "33E": {
             "頭車": {
                 "長車": [2, 1, 0, 2],
@@ -1533,6 +2315,26 @@ const flightData = {
             },
             "尾車": {
                 "長車": [6, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 2, 8, 5]
+            }
+        },
+        "33K": {
+            "頭車": {
+                "長車": [2, 1, 0, 3],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 1, 4, 4]
+            },
+            "尾車": {
+                "長車": [6, 3, 0, 3],
                 "短車": [0, 0, 0, 2],
                 "焗爐": [8, 0, 0, 0],
                 "手挽": [0, 2, 8, 5]
@@ -1580,6 +2382,26 @@ const flightData = {
                 "手挽": [0, 2, 8, 5]
             }
         },
+        "33B": {
+            "頭車": {
+                "長車": [2, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 5, 6]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 3],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 7, 3]
+            }
+        },
         "33J": {
             "頭車": {
                 "長車": [2, 0, 0, 4],
@@ -1618,6 +2440,26 @@ const flightData = {
                 "短車": [1, 1, 0, 0],
                 "焗爐": [4, 0, 0, 0],
                 "手挽": [1, 0, 6, 6]
+            }
+        },
+       "35J": {
+            "頭車": {
+                "長車": [2, 2, 0, 1],
+                "短車": [0, 0, 0, 5],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 8, 5]
+            },
+            "中車": {
+                "長車": [4, 1, 0, 0],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 13, 11]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 3],
+                "短車": [0, 0, 0, 4],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 3, 14, 7]
             }
         }
     },
@@ -1701,6 +2543,66 @@ const flightData = {
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 9, 6]
             }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [2, 0, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 5, 6]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 3],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 7, 3]
+            }
+        },
+        "35G": {
+            "頭車": {
+                "長車": [2, 2, 0, 2],
+                "短車": [0, 0, 0, 4],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 8, 7]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 12, 23]
+            },
+            "尾車": {
+                "長車": [6, 1, 0, 2],
+                "短車": [0, 1, 0, 5],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 3, 14, 7]
+            }
+        },
+        "77P": {
+            "頭車": {
+                "長車": [5, 1, 0, 2],
+                "短車": [0, 3, 0, 3],
+                "焗爐": [10, 0, 0, 0],
+                "手挽": [0, 0, 12, 7]
+            },
+            "中車": {
+                "長車": [3, 0, 0, 0],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 5, 5, 1]
+            },
+            "尾車": {
+                "長車": [4, 1, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 7, 2]
+            }
         }
     },
     "488": {
@@ -1722,6 +2624,66 @@ const flightData = {
                 "短車": [1, 1, 0, 0],
                 "焗爐": [4, 0, 0, 0],
                 "手挽": [1, 0, 6, 6]
+            }
+        },
+        "33E": {
+            "頭車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 1, 4, 4]
+            },
+            "尾車": {
+                "長車": [6, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 2, 8, 5]
+            }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [2, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 5, 6]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 3],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 7, 3]
+            }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [2, 0, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 0],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 2, 6, 4]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 2],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 9, 6]
             }
         }
     },
@@ -1804,6 +2766,26 @@ const flightData = {
                 "短車": [0, 0, 0, 0],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 9, 6]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [2, 0, 0, 4],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 1],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 1, 5, 4]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 2],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 2, 8, 3]
             }
         }
     },
@@ -1888,6 +2870,26 @@ const flightData = {
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [4, 0, 10, 6]
             }
+        },
+        "33E": {
+            "頭車": {
+                "長車": [3, 0, 0, 4],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 1, 4, 4]
+            },
+            "尾車": {
+                "長車": [6, 2, 0, 1],
+                "短車": [0, 6, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 2, 10, 5]
+            }
         }
     },    
     "502": {
@@ -1949,6 +2951,26 @@ const flightData = {
                 "短車": [0, 3, 0, 1],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [4, 0, 10, 6]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [3, 0, 0, 3],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 1, 6, 4]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 4],
+                "短車": [0, 3, 0, 3],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 2, 9, 3]
             }
         },
     "35G": {
@@ -2116,6 +3138,26 @@ const flightData = {
                 "焗爐": [8, 0, 0, 0],
                 "手挽": [0, 3, 14, 7]
             }
+        },
+        "77P": {
+            "頭車": {
+                "長車": [6, 1, 0, 3],
+                "短車": [0, 6, 2, 4],
+                "焗爐": [11, 0, 0, 0],
+                "手挽": [1, 0, 13, 7]
+            },
+            "中車": {
+                "長車": [3, 0, 0, 1],
+                "短車": [0, 5, 0, 1],
+                "焗爐": [7, 0, 0, 0],
+                "手挽": [1, 5, 6, 1]
+            },
+            "尾車": {
+                "長車": [4, 1, 0, 1],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 8, 2]
+            }
         }
     },
     "520": {
@@ -2137,6 +3179,46 @@ const flightData = {
                 "短車": [0, 3, 0, 1],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 8, 2]
+            }
+        },
+        "77A": {
+            "頭車": {
+                "長車": [10, 0, 0, 5],
+                "短車": [0, 6, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 13, 6]
+            },
+            "中車": {
+                "長車": [7, 1, 0, 2],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [2, 4, 7, 4]
+            },
+            "尾車": {
+                "長車": [8, 3, 0, 0],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 9, 3]
+            }
+        },
+        "77K": {
+            "頭車": {
+                "長車": [11, 2, 0, 2],
+                "短車": [2, 4, 0, 6],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 12, 9]
+            },
+            "中車": {
+                "長車": [6, 0, 0, 2],
+                "短車": [1, 5, 0, 0],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 3, 7, 3]
+            },
+            "尾車": {
+                "長車": [10, 1, 0, 0],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [2, 1, 9, 3]
             }
         }
     },
@@ -2285,6 +3367,26 @@ const flightData = {
                 "短車": [0, 4, 0, 0],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [2, 2, 8, 3]
+            }
+        },
+        "33E": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 0],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 2, 4, 3]
+            },
+            "尾車": {
+                "長車": [13, 2, 0, 1],
+                "短車": [0, 6, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [5, 2, 10, 5]
             }
         },
         "77P": {
@@ -2497,6 +3599,26 @@ const flightData = {
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 8, 2]
             }
+        },
+        "77K": {
+            "頭車": {
+                "長車": [12, 2, 0, 2],
+                "短車": [2, 4, 0, 2],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 13, 10]
+            },
+            "中車": {
+                "長車": [6, 0, 0, 2],
+                "短車": [1, 5, 0, 0],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 3, 7, 3]
+            },
+            "尾車": {
+                "長車": [7, 1, 0, 0],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [2, 1, 9, 3]
+            }
         }
     },
     "596": {
@@ -2606,6 +3728,26 @@ const flightData = {
                 "短車": [0, 3, 0, 3],
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [2, 0, 9, 3]
+            }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [3, 0, 0, 3],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 0],
+                "短車": [0, 5, 0, 3],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 9, 4]
+            },
+            "尾車": {
+                "長車": [6, 3, 0, 2],
+                "短車": [0, 3, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [4, 1, 10, 3]
             }
         },
         "33E": {
@@ -2770,6 +3912,26 @@ const flightData = {
                 "短車": [0, 3, 0, 1],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [5, 1, 10, 3]
+            }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [5, 0, 0, 1],
+                "短車": [1, 3, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 8, 6]
+            },
+            "尾車": {
+                "長車": [11, 2, 0, 0],
+                "短車": [0, 4, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [2, 2, 8, 3]
             }
         }
     },
@@ -2981,6 +4143,26 @@ const flightData = {
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [4, 0, 10, 5]
             }
+        },
+        "77P": {
+            "頭車": {
+                "長車": [14, 2, 0, 2],
+                "短車": [0, 5, 2, 3],
+                "焗爐": [11, 0, 0, 0],
+                "手挽": [1, 0, 13, 7]
+            },
+            "中車": {
+                "長車": [7, 0, 0, 1],
+                "短車": [2, 5, 0, 1],
+                "焗爐": [7, 0, 0, 0],
+                "手挽": [1, 1, 6, 1]
+            },
+            "尾車": {
+                "長車": [9, 1, 0, 0],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 8, 2]
+            }
         }
     },
     "695": {
@@ -3026,6 +4208,66 @@ const flightData = {
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 8, 2]
             }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [3, 0, 0, 3],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 0],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 7, 4]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 2],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [4, 1, 10, 3]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [3, 0, 0, 4],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 1],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 5, 4]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 0, 9, 3]
+            }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 0, 7, 5]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 1],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [1, 0, 8, 3]
+            }
         }
     },    
     "705": {
@@ -3067,6 +4309,26 @@ const flightData = {
                 "短車": [0, 0, 0, 0],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [1, 0, 8, 3]
+            }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 0],
+                "短車": [0, 0, 0, 4],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 7, 4]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 3],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [4, 1, 10, 3]
             }
         },
         "33E": {
@@ -3191,6 +4453,26 @@ const flightData = {
                 "短車": [0, 0, 0, 2],
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [2, 0, 9, 5]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [3, 0, 0, 4],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 1],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 5, 4]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 0, 9, 3]
             }
         },
         "32Q": {
@@ -3398,6 +4680,26 @@ const flightData = {
                 "焗爐": [8, 0, 0, 0],
                 "手挽": [0, 0, 14, 8]
             }
+        },
+        "77P": {
+            "頭車": {
+                "長車": [14, 2, 0, 2],
+                "短車": [0, 5, 2, 3],
+                "焗爐": [11, 0, 0, 0],
+                "手挽": [0, 0, 13, 7]
+            },
+            "中車": {
+                "長車": [7, 0, 0, 1],
+                "短車": [2, 5, 0, 1],
+                "焗爐": [7, 0, 0, 0],
+                "手挽": [1, 4, 6, 1]
+            },
+            "尾車": {
+                "長車": [9, 1, 0, 0],
+                "短車": [0, 3, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 8, 2]
+            }
         }
     },
     "729": {
@@ -3462,7 +4764,27 @@ const flightData = {
                 "長車": [14, 0, 0, 0],
                 "短車": [3, 10, 1, 2],
                 "焗爐": [8, 0, 0, 0],
-                "手挽": [0, 3, 14, 8]
+                "手挽": [0, 0, 14, 8]
+            }
+        },
+        "35J": {
+            "頭車": {
+                "長車": [3, 2, 0, 1],
+                "短車": [0, 0, 1, 5],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 8, 4]
+            },
+            "中車": {
+                "長車": [5, 1, 0, 2],
+                "短車": [2, 3, 0, 3],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 13, 14]
+            },
+            "尾車": {
+                "長車": [15, 0, 0, 0],
+                "短車": [3, 9, 1, 2],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [2, 0, 15, 8]
             }
         }
     },
@@ -3588,6 +4910,46 @@ const flightData = {
                 "焗爐": [8, 0, 0, 0],
                 "手挽": [0, 0, 8, 5]
             }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [2, 0, 0, 4],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 5, 4]
+            },
+            "尾車": {
+                "長車": [6, 1, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [7, 0, 0, 0],
+                "手挽": [0, 0, 8, 3]
+            }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [2, 0, 0, 4],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 0],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 1, 6, 4]
+            },
+            "尾車": {
+                "長車": [6, 1, 0, 2],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 1, 9, 3]
+            }
         }
     },
     "751": {
@@ -3670,9 +5032,69 @@ const flightData = {
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [2, 0, 9, 3]
             }
+        },
+        "32Q": {
+            "頭車": {
+                "長車": [2, 0, 0, 1],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 2, 1]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 0, 0]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [1, 1, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 6, 6]
+            }
         }
     },
     "755": {
+        "33P": {
+            "頭車": {
+                "長車": [3, 0, 0, 3],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 0],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 7, 4]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 2],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [4, 1, 10, 3]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [3, 0, 0, 4],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 1],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 5, 4]
+            },
+            "尾車": {
+                "長車": [5, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 0, 9, 3]
+            }
+        },
         "77P": {
             "頭車": {
                 "長車": [6, 1, 0, 2],
@@ -3691,6 +5113,26 @@ const flightData = {
                 "短車": [0, 0, 0, 0],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 8, 2]
+            }
+        },
+        "35G": {
+            "頭車": {
+                "長車": [3, 2, 0, 1],
+                "短車": [0, 0, 1, 5],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 8, 5]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [2, 0, 12, 17]
+            },
+            "尾車": {
+                "長車": [6, 2, 0, 2],
+                "短車": [1, 0, 0, 5],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 0, 14, 8]
             }
         }
     },
@@ -3736,6 +5178,88 @@ const flightData = {
             }
         }
         
+    },
+    "767": {
+        "33P": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [0, 0, 0, 5],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 7, 4]
+            },
+            "尾車": {
+                "長車": [12, 2, 0, 2],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [4, 1, 10, 3]
+            }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [5, 1, 0, 1],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 7, 5]
+            },
+            "尾車": {
+                "長車": [11, 2, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [2, 0, 8, 3]
+            }
+        },
+        "33E": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [2, 0, 0, 0],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 4, 3]
+            },
+            "尾車": {
+                "長車": [13, 3, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 0, 9, 5]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [4, 1, 0, 0],
+                "短車": [1, 0, 0, 3],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 3, 5, 4]
+            },
+            "尾車": {
+                "長車": [12, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 0, 9, 3]
+            }
+        }
     },
     "769": {
         "32Q": {
@@ -3817,27 +5341,45 @@ const flightData = {
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 1, 10, 3]
             }
-        }
-    },
-    "767": {
-        "33P": {
+        },
+        "33B": {
             "頭車": {
                 "長車": [4, 0, 0, 2],
                 "短車": [0, 2, 0, 0],
-                "焗爐": [3, 0, 0, 0],
-                "手挽": [0, 0, 5, 3]
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
             },
             "中車": {
-                "長車": [5, 1, 0, 0],
-                "短車": [0, 0, 0, 5],
+                "長車": [5, 1, 0, 1],
+                "短車": [0, 1, 0, 1],
                 "焗爐": [4, 0, 0, 0],
-                "手挽": [0, 0, 7, 4]
+                "手挽": [0, 0, 7, 5]
             },
             "尾車": {
-                "長車": [12, 2, 0, 2],
-                "短車": [0, 0, 0, 1],
+                "長車": [11, 2, 0, 0],
+                "短車": [0, 0, 0, 0],
                 "焗爐": [6, 0, 0, 0],
-                "手挽": [4, 1, 10, 3]
+                "手挽": [0, 0, 8, 3]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [4, 1, 0, 0],
+                "短車": [1, 0, 0, 3],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 3, 5, 4]
+            },
+            "尾車": {
+                "長車": [12, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [2, 0, 9, 3]
             }
         }
     },
@@ -4236,6 +5778,46 @@ const flightData = {
                 "手挽": [5, 0, 10, 5]
             }
         },
+        "33E": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 0],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 4, 3]
+            },
+            "尾車": {
+                "長車": [13, 2, 0, 1],
+                "短車": [0, 6, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [5, 0, 10, 5]
+            }
+        },
+        "35G": {
+            "頭車": {
+                "長車": [3, 2, 0, 1],
+                "短車": [0, 0, 1, 5],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 8, 5]
+            },
+            "中車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [1, 0, 0, 1],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 12, 17]
+            },
+            "尾車": {
+                "長車": [14, 0, 0, 0],
+                "短車": [3, 10, 1, 2],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 0, 14, 8]
+            }
+        }, 
         "35J": {
             "頭車": {
                 "長車": [3, 2, 0, 1],
@@ -4679,6 +6261,26 @@ const flightData = {
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 8, 2]
             }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [5, 0, 0, 1],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [7, 0, 0, 0],
+                "手挽": [0, 0, 7, 4]
+            },
+            "尾車": {
+                "長車": [12, 2, 0, 2],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [4, 1, 10, 3]
+            }
         }
     },
     "924": {
@@ -4724,6 +6326,28 @@ const flightData = {
         }
 
     },
+    "925": {
+        "32Q": {
+            "頭車": {
+                "長車": [2, 0, 0, 1],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 2, 1]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 0, 0]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [1, 1, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 6, 7]
+            }
+        }
+    }, 
     "928": {
         "32Q": {
             "頭車": {
@@ -4787,6 +6411,26 @@ const flightData = {
                 "手挽": [0, 2, 8, 5]
             }
         },
+        "33J": {
+            "頭車": {
+                "長車": [5, 0, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [7, 1, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [1, 3, 5, 4]
+            },
+            "尾車": {
+                "長車": [12, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [7, 0, 0, 0],
+                "手挽": [0, 1, 8, 3]
+            }
+        },
         "33B": {
             "頭車": {
                 "長車": [4, 0, 0, 2],
@@ -4805,6 +6449,46 @@ const flightData = {
                 "短車": [0, 4, 0, 0],
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 7, 3]
+            }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [7, 1, 0, 0],
+                "短車": [1, 0, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 2, 6, 4]
+            },
+            "尾車": {
+                "長車": [12, 1, 0, 2],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 9, 6]
+            }
+        },
+        "32Q": {
+            "頭車": {
+                "長車": [1, 0, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 2, 1]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 0, 0]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [1, 1, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 0, 6, 5]
             }
         }
     },
@@ -4934,69 +6618,6 @@ const flightData = {
             }
         }
     },
-    "958": {
-        "33J": {
-            "頭車": {
-                "長車": [3, 0, 0, 4],
-                "短車": [0, 2, 0, 1],
-                "焗爐": [4, 0, 0, 0],
-                "手挽": [0, 0, 6, 3]
-            },
-            "中車": {
-                "長車": [3, 1, 0, 1],
-                "短車": [0, 0, 0, 0],
-                "焗爐": [4, 0, 0, 0],
-                "手挽": [2, 1, 5, 4]
-            },
-            "尾車": {
-                "長車": [7, 2, 0, 1],
-                "短車": [0, 0, 0, 2],
-                "焗爐": [9, 0, 0, 0],
-                "手挽": [2, 2, 9, 3]
-            }
-        },
-        "33P": {
-            "頭車": {
-                "長車": [3, 0, 0, 2],
-                "短車": [0, 2, 0, 1],
-                "焗爐": [3, 0, 0, 0],
-                "手挽": [0, 0, 5, 3]
-            },
-            "中車": {
-                "長車": [4, 1, 0, 0],
-                "短車": [0, 0, 0, 3],
-                "焗爐": [4, 0, 0, 0],
-                "手挽": [2, 1, 7, 4]
-            },
-            "尾車": {
-                "長車": [7, 2, 0, 2],
-                "短車": [1, 0, 0, 0],
-                "焗爐": [6, 0, 0, 0],
-                "手挽": [4, 0, 10, 6]
-            }
-        },
-
-        "33B": {
-            "頭車": {
-                "長車": [3, 0, 0, 2],
-                "短車": [0, 2, 0, 0],
-                "焗爐": [5, 0, 0, 0],
-                "手挽": [0, 0, 5, 2]
-            },
-            "中車": {
-                "長車": [2, 1, 0, 2],
-                "短車": [0, 1, 0, 1],
-                "焗爐": [4, 0, 0, 0],
-                "手挽": [3, 0, 8, 6]
-            },
-            "尾車": {
-                "長車": [8, 2, 0, 3],
-                "短車": [0, 0, 0, 0],
-                "焗爐": [6, 0, 0, 0],
-                "手挽": [1, 0, 8, 3]
-            }
-        }
-    },
     "954": {
         "32Q": {
             "頭車": {
@@ -5116,6 +6737,88 @@ const flightData = {
             "尾車": {
                 "長車": [5, 1, 0, 0],
                 "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 0, 6, 5]
+            }
+        }
+    },
+    "958": {
+        "33J": {
+            "頭車": {
+                "長車": [3, 0, 0, 4],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [3, 1, 0, 1],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 1, 5, 4]
+            },
+            "尾車": {
+                "長車": [7, 2, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [9, 0, 0, 0],
+                "手挽": [2, 2, 9, 3]
+            }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [4, 1, 0, 0],
+                "短車": [0, 0, 0, 3],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 1, 7, 4]
+            },
+            "尾車": {
+                "長車": [7, 2, 0, 2],
+                "短車": [1, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [4, 0, 10, 6]
+            }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [3, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [3, 0, 8, 6]
+            },
+            "尾車": {
+                "長車": [8, 2, 0, 3],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [1, 0, 8, 3]
+            }
+        },
+        "32Q": {
+            "頭車": {
+                "長車": [2, 0, 0, 1],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 2, 1]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 0, 0]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [1, 1, 0, 0],
                 "焗爐": [4, 0, 0, 0],
                 "手挽": [2, 0, 6, 5]
             }
@@ -5246,6 +6949,26 @@ const flightData = {
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 9, 6]
             }
+        },
+        "32Q": {
+            "頭車": {
+                "長車": [1, 0, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 2, 1]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 0, 0]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [1, 1, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 0, 6, 5]
+            }
         }
     },
     "978": {
@@ -5269,6 +6992,26 @@ const flightData = {
                 "手挽": [0, 2, 8, 5]
             }
         },
+        "33K": {
+            "頭車": {
+                "長車": [3, 1, 0, 3],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [1, 1, 4, 4]
+            },
+            "尾車": {
+                "長車": [8, 3, 0, 2],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [8, 0, 0, 0],
+                "手挽": [0, 2, 8, 5]
+            }
+        },
         "33B": {
             "頭車": {
                 "長車": [2, 0, 0, 3],
@@ -5279,7 +7022,7 @@ const flightData = {
             "中車": {
                 "長車": [2, 1, 0, 2],
                 "短車": [0, 1, 0, 1],
-                "焗爐": [04, 0, 0, 0],
+                "焗爐": [4, 0, 0, 0],
                 "手挽": [1, 0, 6, 6]
             },
             "尾車": {
@@ -5328,7 +7071,27 @@ const flightData = {
         "焗爐": [6, 0, 0, 0],
         "手挽": [0, 0, 9, 6]
     }
-}
+    },
+        "32Q": {
+            "頭車": {
+                "長車": [1, 0, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 2, 1]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 0, 0]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [1, 1, 0, 2],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 0, 6, 5]
+            }
+        }
     },
     "982": {
         "33E": {
@@ -5391,7 +7154,6 @@ const flightData = {
                 "手挽": [4, 0, 9, 6]
             }
         }
-        
     },
     "986": {
         "33J": {
@@ -5434,6 +7196,26 @@ const flightData = {
                 "手挽": [0, 2, 9, 5]
             }
         },
+        "33P": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [6, 1, 0, 0],
+                "短車": [1, 0, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 2, 7, 4]
+            },
+            "尾車": {
+                "長車": [13, 2, 0, 2],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 10, 6]
+            }
+        },
         "33K": {
             "頭車": {
                 "長車": [4, 1, 0, 2],
@@ -5453,9 +7235,49 @@ const flightData = {
                 "焗爐": [9, 0, 0, 0],
                 "手挽": [5, 3, 9, 5]
             }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [4, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [5, 1, 0, 1],
+                "短車": [1, 1, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 0, 8, 5]
+            },
+            "尾車": {
+                "長車": [13, 2, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [2, 0, 8, 3]
+            }
         }
     },
     "990": {
+        "32Q": {
+            "頭車": {
+                "長車": [1, 0, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [2, 0, 0, 0],
+                "手挽": [0, 0, 2, 1]
+            },
+            "中車": {
+                "長車": [0, 0, 0, 0],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [0, 0, 0, 0],
+                "手挽": [0, 0, 0, 0]
+            },
+            "尾車": {
+                "長車": [5, 1, 0, 0],
+                "短車": [1, 1, 0, 0],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [2, 0, 6, 5]
+            }
+        },
         "33E": {
             "頭車": {
                 "長車": [5, 0, 0, 2],
@@ -5495,6 +7317,26 @@ const flightData = {
                 "焗爐": [6, 0, 0, 0],
                 "手挽": [0, 0, 9, 6]
             }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [2, 0, 0, 2],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 6, 6]
+            },
+            "尾車": {
+                "長車": [7, 1, 0, 2],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 7, 3]
+            }
         }
     },
     "994": {
@@ -5517,165 +7359,107 @@ const flightData = {
                 "焗爐": [4, 0, 0, 0],
                 "手挽": [2, 0, 6, 5]
             }
+        },
+        "33P": {
+            "頭車": {
+                "長車": [2, 0, 0, 3],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [3, 0, 0, 0],
+                "手挽": [0, 0, 5, 3]
+            },
+            "中車": {
+                "長車": [4, 0, 0, 1],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 2, 6, 4]
+            },
+            "尾車": {
+                "長車": [6, 1, 0, 2],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 9, 6]
+            }
+        },
+        "33J": {
+            "頭車": {
+                "長車": [2, 0, 0, 4],
+                "短車": [0, 2, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [0, 0, 6, 3]
+            },
+            "中車": {
+                "長車": [3, 0, 0, 1],
+                "短車": [0, 0, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 1, 5, 4]
+            },
+            "尾車": {
+                "長車": [6, 1, 0, 1],
+                "短車": [0, 0, 0, 2],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 2, 8, 3]
+            }
+        },
+        "33B": {
+            "頭車": {
+                "長車": [2, 0, 0, 3],
+                "短車": [0, 2, 0, 0],
+                "焗爐": [5, 0, 0, 0],
+                "手挽": [0, 0, 5, 2]
+            },
+            "中車": {
+                "長車": [2, 1, 0, 2],
+                "短車": [0, 1, 0, 1],
+                "焗爐": [4, 0, 0, 0],
+                "手挽": [1, 0, 6, 6]
+            },
+            "尾車": {
+                "長車": [7, 1, 0, 2],
+                "短車": [0, 0, 0, 0],
+                "焗爐": [6, 0, 0, 0],
+                "手挽": [0, 0, 7, 3]
+            }
         }
     }
-}; 
-  
+};
 
-        // Tab切換功能
-        function openTab(tabId) {
-            const tabContents = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove('active');
-            }
-            
-            const tabButtons = document.getElementsByClassName('tab-button');
-            for (let i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].classList.remove('active');
-            }
-            
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-
-    // 定義設備類型索引常量
-    const EQUIPMENT_INDEX = {
-        KITCHEN: 0,
-        BAR: 1,
-        ELDERLY: 2,
-        WATER: 3
-    };
-        const flightNumberInput = document.getElementById('flightNumber');
-        const aircraftTypeSelect = document.getElementById('aircraftType');
-        const resultsDiv = document.getElementById('results');
-
-        flightNumberInput.addEventListener('input', handleFlightNumberInput);
-        aircraftTypeSelect.addEventListener('change', handleAircraftTypeChange);
-
-    // 處理航機編號輸入
-    function handleFlightNumberInput() {
-        const flightNumber = flightNumberInput.value.trim();
-
-        if (!flightNumber) {
-            aircraftTypeSelect.innerHTML = '<option value="">請輸入航機編號</option>';
-            aircraftTypeSelect.disabled = true;
-            resultsDiv.innerHTML = '<p class="no-results">請輸入航機編號進行查詢</p>';
-            return;
-        }
-
-        resultsDiv.innerHTML = '<p class="loading">搜尋中...</p>';
-
-        setTimeout(() => {
-            const aircraftData = flightData[flightNumber];
-            if (!aircraftData) {
-                showNoResults();
-                aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
-                aircraftTypeSelect.disabled = true;
-                return;
-            }
-
-            // 更新機型下拉選項
-            const types = Object.keys(aircraftData);
-            updateAircraftTypeOptions(types);
-
-            if (types.length === 1) {
-                displayResults(flightNumber, types[0]);
-                aircraftTypeSelect.value = types[0];
-            } else {
-                showTypeSelectionPrompt(flightNumber, types);
-            }
-        }, 300);
+        // 基础配置数据
+        const positionConfig = {
+  "32Q": {
+    "頭車": {
+      "長車": {
+        "廚房": [
+          { "位置": "101", "名稱": "J Tray", "顏色": 1 }
+        ],
+        "水吧": [
+          { "位置": "102", "名稱": "China J", "顏色": 3 },
+        ]
+      }
+    },
+    "尾車": {
+      "長車": {
+        "廚房": [
+          { "位置": "401", "名稱": "Y Tray", "顏色": 1 },
+          { "位置": "402", "名稱": "Y Tray", "顏色": 1 },
+          { "位置": "403", "名稱": "Y Tray", "顏色": 1 },
+          { "位置": "503R", "名稱": "Y Tray", "顏色": 1 },
+          { "位置": "504R", "名稱": "Y Tray", "顏色": 1 },
+        ]
+      },
+      "短車": {
+        "廚房": [
+          { "位置": "503R", "名稱": "CA Meal", "顏色": 1 }
+          ]
+      } 
     }
-
-        function handleAircraftTypeChange() {
-            const flightNumber = flightNumberInput.value.trim();
-            const aircraftType = aircraftTypeSelect.value;
-            if (!flightNumber || !aircraftType) return;
-
-            const aircraftData = flightData[flightNumber][aircraftType];
-            if (!aircraftData) {
-                showNoResults();
-                return;
-            }
-
-            displayResults(flightNumber, aircraftType);
-        }
-
-        function updateAircraftTypeOptions(types) {
-            if (types.length === 0) {
-                aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
-                aircraftTypeSelect.disabled = true;
-            } else {
-                aircraftTypeSelect.innerHTML = '<option value="">請選擇機型</option>';
-                types.forEach(type => {
-                    aircraftTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
-                });
-                aircraftTypeSelect.disabled = false;
-            }
-        }
-
-        function showNoResults() {
-            resultsDiv.innerHTML = '<p class="no-results">找不到符合條件的結果</p>';
-        }
-
-        function showTypeSelectionPrompt(flightNumber, types) {
-            resultsDiv.innerHTML = `
-                <div class="info-message">
-                    <h3>航機編號: ${flightNumber}</h3>
-                    <p>此航機有 ${types.length} 種機型: ${types.join(', ')}</p>
-                    <p>請從下拉選單中選擇機型查看詳細資料</p>
-                </div>
-            `;
-        }
-
-        function displayResults(flightNumber, aircraftType) {
-            const data = flightData[flightNumber][aircraftType];
-            let html = `<h3>航機編號: ${flightNumber}</h3>`;
-            html += `<h3>機型: ${aircraftType}</h3>`;
-
-            for (const carType in data) {
-                html += `<h4 class="section-title">${carType}</h4>`;
-                html += `<table>
-                    <thead>
-                        <tr>
-                            <th>設備類型</th>
-                            <th>廚房</th>
-                            <th>酒倉</th>
-                            <th>老㩒</th>
-                            <th>水吧</th>
-                            <th>總數</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-                for (const equipmentType in data[carType]) {
-                    const equipment = data[carType][equipmentType];
-                    const total = equipment.reduce((acc, val) => acc + val, 0);
-                    html += `<tr>
-                        <td>${equipmentType}</td>
-                        <td>${equipment[EQUIPMENT_INDEX.KITCHEN]}</td>
-                        <td>${equipment[EQUIPMENT_INDEX.BAR]}</td>
-                        <td>${equipment[EQUIPMENT_INDEX.ELDERLY]}</td>
-                        <td>${equipment[EQUIPMENT_INDEX.WATER]}</td>
-                        <td>${total}</td>
-                    </tr>`;
-                }
-
-                html += `</tbody></table>`;
-            }
-
-            resultsDiv.innerHTML = html;
-        }
-
-        // 位置配置查詢功能
-        const positionConfigData = {
+  },
   "33E": {
     "頭車": {
       "長車": {
         "廚房": [
           { "位置": "101", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "102", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "104", "名稱": "Crew Meal", "顏色": 1 }
+          { "位置": "102", "名稱": "Crew Meal", "顏色": 1 },
+          { "位置": "104", "名稱": "J Tray", "顏色": 1 }
         ],
         "水吧": [
           { "位置": "103", "名稱": "China J", "顏色": 3 },
@@ -5735,7 +7519,7 @@ const flightData = {
     "中車": {
       "長車": {
         "廚房": [
-          { "位置": "301", "名稱": "Y Tray", "顏色": 1 },
+          { "位置": "301", "名稱": "Crew Meal", "顏色": 1 },
           { "位置": "303", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "304", "名稱": "Y Tray", "顏色": 1 }
 
@@ -5748,7 +7532,6 @@ const flightData = {
           { "位置": "602", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "603", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "604", "名稱": "Y Tray", "顏色": 1 },
-          { "位置": "605", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "702", "名稱": "CA MEAL", "顏色": 1 }
         ]
       }
@@ -5759,8 +7542,8 @@ const flightData = {
       "長車": {
         "廚房": [
           { "位置": "101", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "102", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "104", "名稱": "Crew Meal", "顏色": 1 }
+          { "位置": "102", "名稱": "Crew Meal", "顏色": 1 },
+          { "位置": "104", "名稱": "J Tray", "顏色": 1 }
         ],
         "水吧": [
           { "位置": "103", "名稱": "China J", "顏色": 3 },
@@ -5828,8 +7611,8 @@ const flightData = {
       "長車": {
         "廚房": [
           { "位置": "102", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "103", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "104", "名稱": "Crew Meal", "顏色": 1 }
+          { "位置": "103", "名稱": "Crew Meal", "顏色": 1 },
+          { "位置": "104", "名稱": "J Tray", "顏色": 1 }
         ],
         "水吧": [
           { "位置": "102C", "名稱": "China J", "顏色": 3 },
@@ -5861,12 +7644,12 @@ const flightData = {
     "頭車": {
       "長車": {
         "廚房": [
-          { "位置": "101C", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "102C", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "105C", "名稱": "Crew Meal", "顏色": 1 }
+          { "位置": "C101", "名稱": "J Tray", "顏色": 1 },
+          { "位置": "C102", "名稱": "Crew Meal", "顏色": 1 },
+          { "位置": "C105", "名稱": "J Tray", "顏色": 1 }
         ],
         "水吧": [
-          { "位置": "104C", "名稱": "China J", "顏色": 3 }
+          { "位置": "C104", "名稱": "China J", "顏色": 3 }
         ]
       }
     },
@@ -5881,8 +7664,8 @@ const flightData = {
     "尾車": {
       "長車": {
         "廚房": [
-          { "位置": "801", "名稱": "Y Tray", "顏色": 1 },
-          { "位置": "802", "名稱": "Y Tray", "顏色": 1 },
+          { "位置": "801", "名稱": "W/Y Tray", "顏色": 1 },
+          { "位置": "802", "名稱": "W/Y Tray", "顏色": 1 },
           { "位置": "803", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "804", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "805", "名稱": "Y Tray", "顏色": 1 },
@@ -5895,21 +7678,20 @@ const flightData = {
     "頭車": {
       "長車": {
         "廚房": [
-          { "位置": "101C", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "102C", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "105C", "名稱": "Crew Meal", "顏色": 1 }
+          { "位置": "C101", "名稱": "J Tray", "顏色": 1 },
+          { "位置": "C102", "名稱": "Crew Meal", "顏色": 1 },
+          { "位置": "C105", "名稱": "J Tray", "顏色": 1 }
         ],
         "水吧": [
-          { "位置": "104C", "名稱": "China J", "顏色": 3 }
+          { "位置": "C104", "名稱": "China J", "顏色": 3 }
         ]
       }
     },
     "中車": {
       "長車": {
         "廚房": [
-          { "位置": "202", "名稱": "Y Tray", "顏色": 1 },
-          { "位置": "302", "名稱": "Y Tray", "顏色": 1 }, 
-          { "位置": "303", "名稱": "Y Tray", "顏色": 1 }
+          { "位置": "302", "名稱": "W/Y Tray", "顏色": 1 }, 
+          { "位置": "303", "名稱": "W/Y Tray", "顏色": 1 }
         ]
       }
     }, 
@@ -5931,14 +7713,15 @@ const flightData = {
       "長車": {
         "廚房": [
           { "位置": "101", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "102", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "104", "名稱": "Crew Meal", "顏色": 1 },
+          { "位置": "102", "名稱": "Crew Meal", "顏色": 1 },
+          { "位置": "104", "名稱": "J Tray", "顏色": 1 },
           { "位置": "301", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "302", "名稱": "Y Tray", "顏色": 1 }, 
           { "位置": "303", "名稱": "Y Tray", "顏色": 1 }
         ],
         "水吧": [
-          { "位置": "103", "名稱": "China J", "顏色": 3 }
+          { "位置": "106", "名稱": "China J", "顏色": 3 },
+          { "位置": "C103", "名稱": "Glass", "顏色": 3 }
         ]
       }
     },
@@ -5969,18 +7752,18 @@ const flightData = {
           { "位置": "L101", "名稱": "J Tray", "顏色": 1 },
           { "位置": "L102", "名稱": "J Tray", "顏色": 1 },
           { "位置": "L103", "名稱": "Crew Meal", "顏色": 1 },
-          { "位置": "304", "名稱": "Y Tray", "顏色": 1 }
+          { "位置": "304", "名稱": "J Tray", "顏色": 1 }
         ],
         "水吧": [
-          { "位置": "302", "名稱": "China J", "顏色": 3 }
+          { "位置": "306", "名稱": "China J", "顏色": 3 }
         ]
       }
     },
     "中車": {
       "長車": {
         "廚房": [
-          { "位置": "401", "名稱": "Y Tray", "顏色": 1 },
-          { "位置": "402", "名稱": "Y Tray", "顏色": 1 }, 
+          { "位置": "401", "名稱": "W/Y Tray", "顏色": 1 },
+          { "位置": "402", "名稱": "W/Y Tray", "顏色": 1 }, 
           { "位置": "501", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "502", "名稱": "Y Tray", "顏色": 1 }, 
           { "位置": "503", "名稱": "Y Tray", "顏色": 1 }
@@ -5993,7 +7776,8 @@ const flightData = {
           { "位置": "602", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "603", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "604", "名稱": "Y Tray", "顏色": 1 },
-          { "位置": "605", "名稱": "CA MEAL", "顏色": 1 }
+          { "位置": "605", "名稱": "CA MEAL", "顏色": 1 },
+          { "位置": "707", "名稱": "Return特別餐", "顏色": 1 }
         ]
       }
     }
@@ -6002,23 +7786,27 @@ const flightData = {
     "頭車": {
       "長車": {
         "廚房": [
-          { "位置": "L101", "名稱": "J Tray", "顏色": 1 },
-          { "位置": "L103", "名稱": "Crew Meal", "顏色": 1 },
-          { "位置": "303", "名稱": "Y Tray", "顏色": 1 },
-          { "位置": "304", "名稱": "Y Tray", "顏色": 1 }, 
-          { "位置": "306", "名稱": "Y Tray", "顏色": 1 }
+          { "位置": "L101", "名稱": "Meal F", "顏色": 1 },
+          { "位置": "L102", "名稱": "Meal F", "顏色": 2 },
+          { "位置": "L103", "名稱": "Meal F", "顏色": 2 },
+          { "位置": "302", "名稱": "Crew Meal", "顏色": 1 },
+          { "位置": "303", "名稱": "J Tray", "顏色": 1 }, 
+          { "位置": "304", "名稱": "J Tray", "顏色": 1 }
 
         ],
         "水吧": [
-          { "位置": "302", "名稱": "China J", "顏色": 3 }
+          { "位置": "C101", "名稱": "China J", "顏色": 3 },
+          { "位置": "207", "名稱": "Glass", "顏色": 3 },
+          { "位置": "306", "名稱": "China J", "顏色": 3 },
+          { "位置": "307", "名稱": "Glass", "顏色": 3 }
         ]
       }
     },
     "中車": {
       "長車": {
         "廚房": [
-          { "位置": "501", "名稱": "Y Tray", "顏色": 1 },
-          { "位置": "502", "名稱": "Y Tray", "顏色": 1 }, 
+          { "位置": "501", "名稱": "W/Y Tray", "顏色": 1 },
+          { "位置": "502", "名稱": "W/Y Tray", "顏色": 1 }, 
           { "位置": "503", "名稱": "Y Tray", "顏色": 1 }
         ]
       }
@@ -6038,12 +7826,9 @@ const flightData = {
     "頭車": {
       "長車": {
         "廚房": [
-          { "位置": "103", "名稱": "Y Snack", "顏色": 2 },
           { "位置": "302", "名稱": "J Tray", "顏色": 1 },
           { "位置": "303", "名稱": "Crew Meal", "顏色": 1 },
           { "位置": "304", "名稱": "J Bulk", "顏色": 1 }, 
-          { "位置": "306", "名稱": "Y Snack", "顏色": 2 }
-
         ],
         "水吧": [
           { "位置": "305", "名稱": "China J", "顏色": 3 }
@@ -6067,65 +7852,2526 @@ const flightData = {
           { "位置": "606", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "607", "名稱": "Y Tray", "顏色": 1 },
           { "位置": "702", "名稱": "Y Ice Cream", "顏色": 2 },
-          { "位置": "704", "名稱": "CA MEAL", "顏色": 1 },
-          { "位置": "707", "名稱": "Y Bread", "顏色": 1 }
+          { "位置": "704", "名稱": "CA MEAL", "顏色": 1 }
         ]
       }
     }
   }
 };
 
-document.getElementById('positionAircraftType').addEventListener('change', function() {
-    const aircraftType = this.value;
-    const displayDiv = document.getElementById('positionConfigDisplay');
-    
-    if (!aircraftType) {
-        displayDiv.innerHTML = '<div class="no-results">請從上方選擇機型以查看配置</div>';
-        return;
-    }
-    
-    const config = positionConfigData[aircraftType];
-    if (!config) {
-        displayDiv.innerHTML = '<div class="no-results">找不到該機型的配置數據</div>';
-        return;
-    }
-    
-    let html = `<h3>機型: ${aircraftType}</h3>`;
-    
-    // 遍歷每個車廂 (頭車、中車、尾車)
-    for (const [carName, carData] of Object.entries(config)) {
-        html += `<div>
-            <h4 class="section-title">${carName}</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>位置</th>
-                        <th>名稱</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+        // 增强型额外配置
+        const extraConfig = {
+        //隱藏基礎資料 104位置
+        /*   {
+        flights: ["364"],
+        config: {
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "hide": true } // 隐藏位置104
+          ]
+          }
+          },
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+          ]
+          }
+          }
+          }
+        }, */
+
+        // 33E
+        "33E": [
+        { //多2個小食，1個雪糕櫃
+        flights: ["332", "336", "342", "346", "356", "360", "376", "380", "392"],
+        config: {
+                "尾車": {
+                "長車": {
+                "廚房": [
+                { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                { "位置": "703", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                { "位置": "708", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+                ]
+                }
+                }
+                }
+        }, 
+        { //多2個小食櫃
+        flights: ["312", "364"],
+        config: {
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+          { "位置": "703", "名稱": "Snack", "顏色": 2, "isExtra": true }
+          ]
+          }
+          }
+          }
+        },
+        { //多1個特別餐，1個雪糕櫃
+        flights: ["655", "783"],
+        config: {
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "702", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+          { "位置": "708", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+          ]
+          }
+          }
+          }
+        },
+        { //多1個特別餐
+        flights: ["621"],
+        config: {
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "705", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+          ]
+          }
+          }
+          }
+        }, 
+        { //頭2,尾7,尾多1個特別餐
+        flights: ["741", "743"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "hide": true },
+          ]
+          }
+          },
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "703", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+          ]
+          }
+          }
+
+          }
+        }, 
+        { //頭少一個104櫃
+        flights: ["400", "424", "432", "458", "466", "472", "488", "494"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "hide": true}
+          ]
+          }
+          }
+          }
+        }, 
+        { // 頭4,中2，尾13
+        flights: ["580", "598", "767", "769"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "102C", "名稱": "Crew Meal", "顏色": 2, "isExtra": true },
+
+          ]
+          }
+          },
+          "中車": {
+            "長車": {
+              "廚房": [
+                { "位置": "202", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+                { "位置": "205", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "702", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "703", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "707", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "708", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+        }
+        }, 
+        { // 頭5,中3，尾13(尾2隻小食)
+        flights: ["936"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "105", "名稱": "Crew Meal", "顏色": 2, "isExtra": true },
+          { "位置": "102C", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+
+          ]
+          }
+          },
+          "中車": {
+            "長車": {
+              "廚房": [
+                { "位置": "202", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "204", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "205", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                { "位置": "703", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "707", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+                { "位置": "502", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "504", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+        }
+        }, 
+        { // 頭4,中2，尾15(尾2隻小食)
+        flights: ["986"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "102C", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+
+          ]
+          }
+          },
+          "中車": {
+            "長車": {
+              "廚房": [
+                { "位置": "202", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+                { "位置": "205", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                { "位置": "703", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                     { "位置": "707", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "708", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+           
+                { "位置": "502", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "504", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+        }
+        }
+
+        ],
         
-        // 遍歷長車
-        for (const [longCarName, longCarData] of Object.entries(carData)) {
-            // 遍歷區域 (廚房、水吧)
-            for (const [areaName, items] of Object.entries(longCarData)) {
-                // 顯示每個項目
-                for (const item of items) {
-                    // 修正這裡：確保顏色類別正確應用
-                    const colorClass = item.顏色 ? `class="color-${item.顏色}"` : '';
-                    html += `<tr ${colorClass}>
-                        <td>${item.位置}</td>
-                        <td>${item.名稱}</td>
+        // 32Q
+        "32Q": [
+        { //多1隻103櫃，尾403是水吧
+        flights: ["310"],
+        config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "103", "名稱": "J Tray", "顏色": 1, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "403", "名稱": "J Tray", "顏色": 1, "hide": true }
+        ],
+        "水吧": [
+        { "位置": "403", "名稱": "12 Bags/12  Holders", "顏色": 3, "isExtra": true }
+        ], 
+        }
+        }
+
+        }
+        },
+        { //多1隻103 J/Y ice cream
+        flights: ["607", "653", "655", "717", "751", "769", "771", "773", "775"],
+        config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "103", "名稱": "J/Y Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        }
+        }
+
+        ],
+
+          
+        // 33K
+        "33K": [
+        { //多2隻小食，1隻雪糕櫃
+        flights: ["332", "336",  "376", "392"],
+        config: {
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "703", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "708", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        }
+        },
+        { //頭少1隻104櫃
+        flights: ["424", "432", "458", "472"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "102", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "104", "hide": true}
+          ]
+          }
+          }
+          }
+        }, 
+        { // 頭5,中2，尾13
+        flights: ["769"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "105", "名稱": "Crew Meal", "顏色": 2, "isExtra": true },
+          { "位置": "102C", "名稱": "J  Tray", "顏色": 2, "isExtra": true },
+
+          ]
+          }
+          },
+          "中車": {
+            "長車": {
+              "廚房": [
+                { "位置": "202", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+                { "位置": "205", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "702", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "703", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "707", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "708", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+        }
+        }, 
+        { // 頭5,中3，尾13
+        flights: ["791"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "105", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+          { "位置": "102C", "名稱": "J  Tray", "顏色": 2, "isExtra": true },
+
+          ]
+          }
+          },
+          "中車": {
+            "長車": {
+              "廚房": [
+                { "位置": "201", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+                { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+                { "位置": "205", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "702", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "703", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "707", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "708", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          },
+        }
+        }, 
+        { //頭2,尾7,尾多1個特別餐
+        flights: ["741", "743"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "hide": true },
+          ]
+          }
+          },
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "703", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+          ]
+          }
+          }
+
+          }
+        }, 
+
+        ],
+        
+        // 33A
+        "33A": [
+        { //多2隻小食櫃
+        flights: ["312"],
+        config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "103", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "706", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "707", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        ]
+        }
+        }
+
+        }
+        },
+        { //尾多1隻605櫃
+        flights: ["488"],
+        config: {
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "605", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        ]
+        }
+        }
+
+        }
+        },
+
+        ],
+       
+        
+        // 33P
+        "33P": [
+        { //多2隻小食，1隻雪糕櫃
+        flights: ["332", "336", "356"],
+        config: {
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "204", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "502", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "702", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        
+        },
+        },
+        { //多2隻小食櫃
+        flights: ["312"],
+        config: {
+        "中車": {
+        "長車": {
+        "廚房": [
+          { "位置": "204", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+      }
+    }, 
+    "尾車": {
+      "長車": {
+        "廚房": [
+          { "位置": "502", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+      }
+    }
+  }
+        },
+        {  //頭少1隻105櫃
+        flights: ["472", "488", "494", "530", "717"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "105", "hide": true}
+          ]
+          }
+          }
+          }
+        }, 
+        { //頭4,中5,尾12
+        flights: ["418", "633", "635", "691", "723", "725", "767", "769"],
+        config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "103", "名稱": "J Entree", "顏色": 2, "isExtra": true }, 
+        { "位置": "104", "名稱": "J Tray", "顏色": 2, "isExtra": true }
+        ],
+        "水吧": [
+        {"位置": "103", "hide": true},
+        {"位置": "C103", "名稱": "China J", "顏色": 3, "isExtra": true}
+        ]
+        }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "205", "名稱": "Y Tray", "顏色": 1, "isExtra": true },  
+        { "位置": "302", "名稱": "CA Meal", "顏色": 1, "isExtra": true },
+        { "位置": "304", "名稱": "Y Tray", "顏色": 1, "isExtra": true },  
+        { "位置": "305", "名稱": "Y Entree", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }, 
+        "尾車": {
+        "長車": {
+        "廚房": [
+          { "位置": "504", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+          { "位置": "602", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+          { "位置": "604", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+          { "位置": "605", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+          { "位置": "606", "名稱": "Y Entree", "顏色": 2, "isExtra": true }, 
+          { "位置": "607", "名稱": "Y Tray", "顏色": 1, "isExtra": true }, 
+          { "位置": "702", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+          { "位置": "703", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+          { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+          { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+          { "位置": "707", "名稱": "Y Tray", "顏色": 2, "isExtra": true } 
+        ]
+        }
+        }
+        }
+        }, 
+        { //多1隻特別餐
+        flights: ["621"],
+        config: {
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "705", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+          ]
+          }
+          }
+          }
+        }, 
+        { //多1隻702雪糕
+        flights: ["771", "773"],
+        config: {
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "702", "名稱": "Y Ice Cream", "顏色": 2, "isExtra": true },
+          ]
+          },
+          "短褲": {
+          "廚房": [
+          { "位置": "708R", "名稱": "Y Ice Cream", "顏色": 2, "isExtra": true },
+          ]
+          
+          }
+          }
+          }
+        }, 
+
+        ],
+        
+        // 33J
+        "33J": [
+        { //多2隻小食，1隻雪糕櫃
+        flights: ["336", "342", "356", "360", "376", "380", "392"],
+        config: {
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "205", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "708", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        
+        }
+        }, 
+        {// 多2隻小食櫃
+        flights: ["312"],
+        config: {
+    "中車": {
+      "長車": {
+        "廚房": [
+          { "位置": "205", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+      }
+    }, 
+    "尾車": {
+      "長車": {
+        "廚房": [
+          { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+      }
+    }
+  }
+        },
+        { // 頭少101櫃
+        flights: ["400", "420", "424", "432", "458", "466", "472", "494"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "101", "hide": true}
+          ]
+          }
+          }
+          }
+        },
+        { //頭5,中4，尾12
+        flights: ["418", "633", "635", "691", "777"],
+        config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "104", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+        { "位置": "105", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+        { "位置": "102C", "名稱": "Crew Meal", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "201", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "202", "名稱": "Y Tray", "顏色": 2, "isExtra": true }
+
+        ]
+        },
+        "短車": {
+        "廚房": [
+        { "位置": "301R", "名稱": "Y Entree", "顏色": 2, "isExtra": true }
+
+        ]
+        }
+        }, 
+        "尾車": {
+        "長車": {
+        "廚房": [
+          { "位置": "606", "名稱": "CA Meal", "顏色": 2, "isExtra": true }, 
+          { "位置": "607", "名稱": "CA Meal", "顏色": 1, "isExtra": true }, 
+
+          { "位置": "702", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+          { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+          { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+          { "位置": "707", "名稱": "Y Entree", "顏色": 2, "isExtra": true }, 
+          { "位置": "708", "名稱": "Y Entree", "顏色": 2, "isExtra": true }, 
+
+        ]
+        }
+        }
+        }
+        },
+        { // 多1個特別餐
+        flights: ["621"],
+        config: {
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "705", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+          ]
+          }
+          }
+          }
+        },
+        { // 頭少1隻104,尾多1個702特別餐
+        flights: ["741", "743"],
+        config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "104", "hide": true },
+        ]
+        }
+        },
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "702", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+          ]
+          }
+          }
+          }
+        }, 
+        
+        { //多1個雪糕，1個特別餐
+        flights: ["783"],
+        config: {
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "702", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+          { "位置": "708", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+          ]
+          }
+          }
+          }
+        },
+
+        ],
+        
+        // 33B
+        "33B": [
+        { //多2隻小食，1隻雪糕櫃
+        flights: ["332", "336", "346", "356", "380"],
+        config: {
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "607", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "706", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        }
+        }, 
+        { //多2隻小食櫃
+        flights: ["312"],
+        config: {
+    "尾車": {
+      "長車": {
+        "廚房": [
+          { "位置": "607", "名稱": "Snack", "顏色": 2, "isExtra": true },
+          { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+      }
+    }
+  }
+        },
+        { //頭少1隻104櫃
+        flights: ["400", "466", "472", "488", "494", "530"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "103", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "104", "hide": true}
+          ]
+          }
+          }
+          }
+        },
+        { // 頭4,中5,尾11
+        flights: ["418", "536", "635", "723", "725", "767", "769"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "105", "名稱": "Crew Meal", "顏色": 2, "isExtra": true },
+          ]
+          }
+          },
+          "中車": {
+            "長車": {
+              "廚房": [
+                { "位置": "202", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+                { "位置": "301", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "304", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+                { "位置": "305", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "607", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "702", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+                { "位置": "703", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          }
+          }
+        }, 
+        { //頭4,中5,尾13(多2隻小食櫃)
+        flights: ["986"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "104", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "105", "名稱": "Crew Meal", "顏色": 2, "isExtra": true },
+          ]
+          }
+          },
+          "中車": {
+            "長車": {
+              "廚房": [
+                { "位置": "202", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+                { "位置": "301", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "304", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+                { "位置": "305", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "607", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                { "位置": "608", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "701", "名稱": "Y Entree", "顏色": 1, "isExtra": true },
+                { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                { "位置": "703", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                
+              ]
+            }
+          }
+          }
+        }
+
+        ],
+        
+        // 77P
+        "77P": [
+        { //頭7,中4,尾6, 多2隻小食，2隻雪糕櫃
+        flights: ["360", "380"],
+        config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "304", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "405", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "705", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "706", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        
+        },
+        },
+        { //頭7,中3,尾6, 多2隻雪糕，1隻特別餐
+        flights: ["785"],
+        config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "304", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "704", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+        { "位置": "706", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        
+        },
+        },
+        { //頭前少一隻104櫃
+        flights: ["450", "472", "564"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "102", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "104", "hide": true}
+          ]
+          }
+          }
+          }
+        }, 
+        { //頭14,中7,尾9
+        flights: ["410", "504", "520", "633", "691", "725"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "101", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "103", "名稱": "BC Entree", "顏色": 2, "isExtra": true },
+          { "位置": "105", "名稱": "Crew Meal", "顏色": 2, "isExtra": true },
+          { "位置": "C102", "名稱": "J Bulk", "顏色": 2, "isExtra": true },
+
+          { "位置": "201", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+          { "位置": "202", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+          { "位置": "304", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "305", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "306", "名稱": "Y Tray", "顏色": 2, "isExtra": true }
+          ]
+          }
+          },
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "404", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "405", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "506", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+          { "位置": "507", "名稱": "Y Tray", "顏色": 2, "isExtra": true }
+          ]
+          },
+          "短車": {
+          "廚房": [
+          {"位置": "L401R", "名稱": "Y Bread", "顏色": 2,"isExtra": true },
+          {"位置": "L401F", "名稱": "Y Bread", "顏色": 2,"isExtra": true }
+
+          ]
+          }
+          },
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "603", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+          { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "707", "名稱": "CA Meal", "顏色": 2, "isExtra": true }
+          ]
+          }
+          }, 
+
+        }
+        },
+        { //頭13,中7,尾9(少一隻102C)
+        flights: ["536", "588"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "101", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "103", "名稱": "BC Entree", "顏色": 2, "isExtra": true },
+          { "位置": "105", "名稱": "Crew Meal", "顏色": 2, "isExtra": true },
+
+          { "位置": "201", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+          { "位置": "202", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+          { "位置": "304", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "305", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "306", "名稱": "Y Tray", "顏色": 2, "isExtra": true }
+          ]
+          }
+          },
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "404", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "405", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "506", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+          { "位置": "507", "名稱": "Y Tray", "顏色": 2, "isExtra": true }
+          ]
+          },
+          "短車": {
+          "廚房": [
+          {"位置": "L401R", "名稱": "Y Bread", "顏色": 2,"isExtra": true },
+          {"位置": "L401F", "名稱": "Y Bread", "顏色": 2,"isExtra": true }
+
+          ]
+          }
+          },
+          "尾車": {
+          "長車": {
+          "廚房": [
+          { "位置": "603", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+          { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+          { "位置": "707", "名稱": "Crew Meal", "顏色": 2, "isExtra": true }
+          ]
+          }
+          }, 
+
+        }
+        } 
+
+        ],
+        
+        // 77A
+        "77A": [
+        {//多2隻小食，1隻雪糕櫃，1隻麵包櫃
+        flights: ["390"],
+        config: {
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "503", "名稱": "Bread", "顏色": 1, "isExtra": true },
+        { "位置": "504", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "606", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "607", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        
+        },
+        },
+        { // 頭10中7尾8
+        flights: ["548", "520"],
+        config: {
+        "頭車": {
+          "長車": {
+            "廚房": [
+              { "位置": "201", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+              { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "204", "名稱": "J Bulk", "顏色": 2, "isExtra": true }, 
+              { "位置": "302", "hide": true }, 
+              { "位置": "306", "名稱": "J Bulk", "顏色": 2, "isExtra": true }
+
+            ],
+          "水吧": [
+          {"位置": "306", "名稱": "J Bulk", "顏色": 2, "hide": true }
+          ]
+          }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "402", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "403", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "404", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+        { "位置": "504", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true }
+
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "606", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+        { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        ]
+        },
+        "短車": {
+        "廚房": [
+        { "位置": "703R", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        ]
+        }
+
+        }
+        
+        },
+        },
+        { // 頭11,中8,尾10
+        flights: ["253"],
+        config: {
+        "頭車": {
+          "長車": {
+            "廚房": [
+              { "位置": "L103", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+              { "位置": "201", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "203", "名稱": "J Bulk", "顏色": 1, "isExtra": true }, 
+              { "位置": "204", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "205", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "206", "名稱": "J Bulk", "顏色": 2, "isExtra": true },
+              { "位置": "301", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+              { "位置": "302", "hide": true }, 
+              { "位置": "303", "hide": true }, 
+              { "位置": "304", "名稱": "J Bulk", "顏色": 1, "isExtra": true }
+
+            ],
+          "水吧": [
+          {"位置": "306", "名稱": "J Bulk", "顏色": 2, "hide": true }
+          ]
+          }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "401", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "402", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "403", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "404", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true }, 
+        { "位置": "503", "名稱": "W Snack", "顏色": 2, "isExtra": true },
+        { "位置": "504", "名稱": "J Entree", "顏色": 2, "isExtra": true }
+
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "604", "hide": true },
+        { "位置": "605", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "606", "名稱": "W/Y Hot Snack", "顏色": 2, "isExtra": true },
+        { "位置": "607", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "608", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        
+        { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+        { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        ]
+        },
+        }
+        
+        },
+        }, 
+        { // 頭11,中8,尾10
+        flights: ["830"],
+        config: {
+        "頭車": {
+          "長車": {
+            "廚房": [
+              { "位置": "L103", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+              { "位置": "201", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "203", "名稱": "J Bulk", "顏色": 2, "isExtra": true }, 
+              { "位置": "204", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "205", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "206", "名稱": "J Entree", "顏色": 1, "isExtra": true },
+              { "位置": "301", "名稱": "J Bulk", "顏色": 2, "isExtra": true },
+              { "位置": "302", "hide": true }, 
+              { "位置": "303", "hide": true }, 
+              { "位置": "304", "名稱": "J Bulk", "顏色": 2, "isExtra": true }
+
+            ],
+          "水吧": [
+          {"位置": "306", "名稱": "J Bulk", "顏色": 2, "hide": true }
+          ]
+          }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "401", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "402", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "403", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "404", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true }, 
+        { "位置": "503", "名稱": "W Snack", "顏色": 2, "isExtra": true },
+        { "位置": "504", "名稱": "J Entree", "顏色": 2, "isExtra": true }
+
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "604", "hide": true },
+        { "位置": "605", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "606", "名稱": "W/Y Hot Snack", "顏色": 2, "isExtra": true },
+        { "位置": "607", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "608", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        
+        { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+        { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        ]
+        },
+        }
+        
+        },
+        }, 
+
+        { // 頭11,中8,尾9
+        flights: ["163"],
+        config: {
+        "頭車": {
+          "長車": {
+            "廚房": [
+              { "位置": "L103", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+              { "位置": "201", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "203", "名稱": "J Entree", "顏色": 2, "isExtra": true }, 
+              { "位置": "204", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "205", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "206", "名稱": "J Bulk", "顏色": 2, "isExtra": true },
+              { "位置": "301", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+              { "位置": "302", "hide": true }, 
+              { "位置": "303", "hide": true }, 
+              { "位置": "304", "名稱": "J Bulk", "顏色": 1, "isExtra": true }
+
+            ],
+          "水吧": [
+          {"位置": "306", "名稱": "J Bulk", "顏色": 2, "hide": true }
+          ]
+          }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "401", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "402", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "403", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "404", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true }, 
+        { "位置": "503", "名稱": "W Snack", "顏色": 2, "isExtra": true },
+        { "位置": "504", "名稱": "J Entree", "顏色": 2, "isExtra": true }
+
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "604", "hide": true },
+        { "位置": "605", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "607", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "608", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        
+        { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+        { "位置": "706", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        ]
+        },
+        }
+        
+        },
+        },
+        { // 頭11,中7,尾9
+        flights: ["139"],
+        config: {
+        "頭車": {
+          "長車": {
+            "廚房": [
+              { "位置": "L103", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+              { "位置": "201", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "203", "名稱": "J Bulk", "顏色": 2, "isExtra": true }, 
+              { "位置": "204", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "205", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "206", "名稱": "J Bulk", "顏色": 2, "isExtra": true },
+              { "位置": "301", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+              { "位置": "302", "hide": true }, 
+              { "位置": "303", "hide": true }, 
+              { "位置": "304", "名稱": "J Entree", "顏色": 2, "isExtra": true }
+
+            ],
+          "水吧": [
+          {"位置": "306", "名稱": "J Bulk", "顏色": 2, "hide": true }
+          ]
+          }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "401", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "402", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "403", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "404", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true }, 
+        { "位置": "503", "名稱": "W Ice Cream", "顏色": 2, "isExtra": true },
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "604", "hide": true },
+        { "位置": "605", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "607", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "608", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        
+        { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+        { "位置": "706", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        ]
+        },
+        }
+        
+        },
+        }
+
+
+        ], 
+
+        //77K 
+        "77K": [
+        { // 頭12,中6,尾10
+        flights: ["580"],
+        config: {
+        "頭車": {
+        "長車": {
+            "廚房": [
+              { "位置": "201", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+              { "位置": "202", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+              { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "204", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+              { "位置": "207", "名稱": "Y Snack", "顏色": 2, "isExtra": true }, 
+              { "位置": "301", "名稱": "J Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "302", "名稱": "J Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "303", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "304", "名稱": "Y Tray", "顏色": 2, "isExtra": true }
+            ],
+          },
+        "短車": {
+        "廚房": [
+        { "位置": "R2-03R", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+        { "位置": "R2-03F", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+        ]
+        }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "403", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        ]
+        },
+        "短車": {
+        "廚房": [
+        { "位置": "R4-03R", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "606", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "607", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+        { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "707", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+
+        ]
+        },
+
+        }
+        
+        },
+        }, 
+        { // 頭7,中6,尾9
+        flights: ["731"],
+        config: {
+        "頭車": {
+        "長車": {
+            "廚房": [
+              { "位置": "201", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "202", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "206", "名稱": "J Bulk", "顏色": 2, "isExtra": true }, 
+            ],
+          },
+        "短車": {
+        "廚房": [
+        { "位置": "R2-03F", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+        ]
+        }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "503", "名稱": "W Ice Cream", "顏色": 2, "isExtra": true },
+        { "位置": "504", "名稱": "W Entree", "顏色": 2, "isExtra": true },
+
+        ]
+        },
+        "短車": {
+        "廚房": [
+        { "位置": "R4-03R", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "605", "名稱": "W Tray", "顏色": 2, "isExtra": true },
+        { "位置": "606", "名稱": "W Tray", "顏色": 2, "isExtra": true },
+        { "位置": "607", "名稱": "Y Hot Snack", "顏色": 2, "isExtra": true },
+        { "位置": "608", "名稱": "Y Hot Snack", "顏色": 2, "isExtra": true }, 
+        { "位置": "706", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "707", "名稱": "CA Meal", "顏色": 1, "isExtra": true },
+
+        ]
+        },
+
+        }
+        
+        },
+        }, 
+        { // 頭11,中7,尾10
+        flights: ["810", "884"],
+        config: {
+        "頭車": {
+        "長車": {
+            "廚房": [
+              { "位置": "L101", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              { "位置": "L102", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+              
+              { "位置": "201", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "202", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "203", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "204", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+              { "位置": "206", "名稱": "J Bulk", "顏色": 1, "isExtra": true }, 
+              { "位置": "302", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "303", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "304", "名稱": "J Entree", "顏色": 1, "isExtra": true }
+            ],
+          },
+        "短車": {
+        "廚房": [
+        { "位置": "R2-03R", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+        { "位置": "C103R", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+        { "位置": "C103F", "名稱": "J Entrer", "顏色": 2, "isExtra": true },
+        
+        ]
+        }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "404", "名稱": "W/Y Hot Snack", "顏色": 2, "isExtra": true },
+        { "位置": "503", "名稱": "W Fruit/Snack", "顏色": 2, "isExtra": true },
+        { "位置": "504", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+        
+        ]
+        },
+        "短車": {
+        "廚房": [
+        { "位置": "R4-03R", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "605", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "606", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "607", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "608", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        
+        { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "706", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "707", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+
+        ]
+        },
+
+        }
+        
+        },
+        }, 
+        { // 頭11,中7,尾10
+        flights: ["506", "526", "536", "520"],
+        config: {
+        "頭車": {
+        "長車": {
+            "廚房": [
+              { "位置": "L101", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              { "位置": "L102", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+              
+              { "位置": "201", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+              { "位置": "202", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+              { "位置": "203", "名稱": "J Bulk", "顏色": 2, "isExtra": true },
+              { "位置": "204", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+              { "位置": "301", "名稱": "J Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "302", "名稱": "J Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "303", "名稱": "Y Tray", "顏色": 2, "isExtra": true }, 
+              { "位置": "304", "名稱": "Y Tray", "顏色": 2, "isExtra": true }
+            ],
+          },
+        "短車": {
+        "廚房": [
+        { "位置": "R2-03R", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+        { "位置": "R2-03F", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+        ]
+        }
+        },
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "403", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "501", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "502", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        { "位置": "503", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+        
+        ]
+        },
+        "短車": {
+        "廚房": [
+        { "位置": "R4-03R", "名稱": "CA Meal", "顏色": 2, "isExtra": true },
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "605", "名稱": "CA Meal", "顏色": 1, "isExtra": true },
+        { "位置": "606", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "607", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+        { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "705", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "706", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+        { "位置": "707", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+
+        ]
+        },
+
+        }
+        
+        },
+        }, 
+   
+        ], 
+        // 77J
+        "77J": [
+        { //多2隻小食，1隻雪糕櫃，1隻麵包櫃
+        flights: ["334"],
+        config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "103", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "306", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "中車": {
+        "短車": {
+        "廚房": [
+        { "位置": "402R", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "702", "名稱": "Ice Cream", "顏色": 2, "isExtra": true },
+        { "位置": "707", "名稱": "Bread", "顏色": 2, "isExtra": true }
+
+        ]
+        }
+        }
+        
+        },
+        }
+        ], 
+
+        // 35G
+        "35G": [
+        { //多2隻小食，1隻雪糕櫃
+        flights: ["316", "368", "376"],
+        config: {
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "L201", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "604", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "605", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        
+        },
+        },
+        { //頭少1隻C105櫃
+        flights: ["472", "494"],
+          config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "C102", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "C105", "hide": true}
+          ]
+          }
+          }
+          }
+        }, 
+        { // 頭3,中5,尾14
+        flights: ["410", "418", "506", "526", "536", "598", "725", "739", "759", "791"],
+          config: {
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "206R", "名稱": "J Bread", "顏色": 2, "isExtra": true },
+            ]
+          }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "501", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "601", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "604", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "605", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "701", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "702", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "R501F", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R502R", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "504", "名稱": "Y Bread", "顏色": 1, "isExtra": true },
+
+              ]
+            }
+          }
+          }
+        }, 
+        { // 頭3,中6,尾10
+        flights: ["647"],
+          config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "C102", "名稱": "J Tray", "顏色": 1, "isExtra": true }
+        ]
+        }
+        },
+
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "L202", "名稱": "J Bulk", "顏色": 2, "isExtra": true },
+
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "304F", "名稱": "W Ice Cream", "顏色": 2, "isExtra": true },
+            ]
+          }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "604", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "605", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "502R", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+                { "位置": "R502R", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R503F", "名稱": "Y Giveaway", "顏色": 2, "isExtra": true },
+
+                { "位置": "504", "名稱": "Y Bread", "顏色": 1, "isExtra": true },
+
+              ]
+            }
+          }
+          }
+        }, 
+        { // 頭3,中7(短1),尾10(短3)
+        flights: ["171"],
+          config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "C102", "名稱": "J Tray", "顏色": 1, "isExtra": true }
+        ]
+        }
+        },
+
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "L201", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+          { "位置": "L202", "名稱": "J Bulk", "顏色": 2, "isExtra": true },
+
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "304F", "名稱": "W Ice Cream", "顏色": 2, "isExtra": true },
+            ]
+          }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "604", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "605", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "R501F", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R503F", "名稱": "Y Giveaway", "顏色": 2, "isExtra": true },
+
+                { "位置": "504", "名稱": "Y Bread", "顏色": 1, "isExtra": true },
+
+              ]
+            }
+          }
+          }
+        },
+        { // 頭3,中7(短1),尾13(短4)
+        flights: ["157", "163"],
+          config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "C102", "名稱": "J Tray", "顏色": 1, "isExtra": true }
+        ]
+        }
+        },
+
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "L201", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+          { "位置": "L202", "名稱": "J Bulk", "顏色": 2, "isExtra": true },
+
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "304F", "名稱": "W Ice Cream", "顏色": 2, "isExtra": true },
+            ]
+          }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "501", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "601", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "604", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+
+                { "位置": "605", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "701", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "R501F", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R502R", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R503F", "名稱": "Y Giveaway", "顏色": 2, "isExtra": true },
+
+                { "位置": "504", "名稱": "Y Bread", "顏色": 1, "isExtra": true },
+
+              ]
+            }
+          }
+          }
+        }, 
+        { // 頭3,中6(短2),尾14(短5)
+        flights: ["239", "257"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "C102", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          ]
+          },
+          "短車": {
+            "水吧": [
+              { "位置": "L103R", "名稱": "Glass", "顏色": 3, "isExtra": true },
+              { "位置": "L103F", "名稱": "Glass", "顏色": 3, "isExtra": true },
+
+            ]
+          }
+          },
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "L201", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+          { "位置": "301", "名稱": "J Bottled water", "顏色": 2, "isExtra": true },
+
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "L202F", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+              { "位置": "304F", "名稱": "W Fruit", "顏色": 2, "isExtra": true },
+
+            ]
+          }
+          },
+
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "601", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "702", "名稱": "W/Y Hot Snack", "顏色": 2, "isExtra": true },
+                { "位置": "501", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                
+                { "位置": "604", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "605", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "701", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "504", "名稱": "Y Bread", "顏色": 1, "isExtra": true },
+                { "位置": "R501F", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R502R", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R503F", "名稱": "Y Giveaway", "顏色": 2, "isExtra": true },
+                { "位置": "502R", "名稱": "Snack", "顏色": 2, "isExtra": true },
+              ]
+            }
+          }
+          }
+        }, 
+        { // 頭3,中6(短2),尾14(短6)
+        flights: ["870"], 
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "C102", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          ]
+          },
+          "短車": {
+            "水吧": [
+              { "位置": "L103R", "名稱": "Glass", "顏色": 3, "isExtra": true },
+              { "位置": "L103F", "名稱": "Glass", "顏色": 3, "isExtra": true },
+
+            ]
+          }
+          },
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "L201", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+          { "位置": "301", "名稱": "J Bottled water", "顏色": 2, "isExtra": true },
+
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "L202F", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+              { "位置": "304F", "名稱": "W Fruit", "顏色": 2, "isExtra": true },
+
+            ]
+          }
+          },
+
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "601", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "702", "名稱": "W/Y Hot Snack", "顏色": 2, "isExtra": true },
+                { "位置": "501", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                
+                { "位置": "604", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "605", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "701", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "504", "名稱": "Y Bread", "顏色": 1, "isExtra": true },
+                { "位置": "R501F", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R502R", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R503R", "名稱": "Extra Snack", "顏色": 2, "isExtra": true },
+                { "位置": "R503F", "名稱": "Y Giveaway", "顏色": 2, "isExtra": true },
+                { "位置": "502R", "名稱": "Snack", "顏色": 2, "isExtra": true },
+              ]
+            }
+          }
+          }
+        }, 
+        { // 頭3,中6(短1),尾13(短4)
+        flights: ["139"],
+          config: {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "C102", "名稱": "J Tray", "顏色": 1, "isExtra": true }
+        ]
+        }
+        },
+
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "L201", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "304F", "名稱": "W Ice Cream", "顏色": 2, "isExtra": true },
+            ]
+          }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "501", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "601", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "604", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+
+                { "位置": "605", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "701", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "R501F", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R502R", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "R503F", "名稱": "Y Giveaway", "顏色": 2, "isExtra": true },
+
+                { "位置": "504", "名稱": "Y Bread", "顏色": 1, "isExtra": true },
+
+              ]
+            }
+          }
+          }
+        }, 
+
+        ], 
+
+        // 35J
+        "35J": [
+        { //多2隻小食，1隻雪糕櫃
+        flights: ["316", "368", "376", "380", "384"],
+        config: {
+        "中車": {
+        "長車": {
+        "廚房": [
+        { "位置": "L201", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "604", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "605", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        }
+        
+        },
+        },
+        { // 頭3,中5,尾15
+        flights: ["506", "526", "739"],
+        config: {
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "206R", "名稱": "J Bread", "顏色": 2, "isExtra": true },
+              { "位置": "206F", "名稱": "J Breakfast", "顏色": 2, "isExtra": true },
+
+            ]
+          }
+          },
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "L501", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "L503", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "601", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "604", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "605", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "701", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "702", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "504", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "505", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "603R", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            }
+          }
+          }
+        }, 
+        { // 頭3,中8(短2),尾14(短4)
+        flights: ["239", "257"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "C102", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          ]
+          },
+          "短車": {
+            "水吧": [
+              { "位置": "L103R", "名稱": "Glass", "顏色": 3, "isExtra": true },
+              { "位置": "L103F", "名稱": "Glass", "顏色": 3, "isExtra": true },
+
+            ]
+          }
+          },
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+          { "位置": "206", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "207", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+          { "位置": "L201", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "L202F", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+              { "位置": "305R", "名稱": "W Fruit", "顏色": 2, "isExtra": true },
+
+            ]
+          }
+          },
+
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "L503", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "R503", "名稱": "W/Y Hot Snack", "顏色": 2, "isExtra": true },
+                { "位置": "L503", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                
+                { "位置": "604", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "605", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "701", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "804", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+                { "位置": "805", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "806", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "504", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "505", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "501R", "名稱": "Y Snack", "顏色": 2, "isExtra": true },
+                { "位置": "502F", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            }
+          }
+          }
+        },
+        { // 頭3,中8(短3),尾14(短4)
+        flights: ["806", "840", "876"],
+        config: {
+          "頭車": {
+          "長車": {
+          "廚房": [
+          { "位置": "C102", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          ]
+          },
+          "短車": {
+            "水吧": [
+              { "位置": "L103R", "名稱": "Glass", "顏色": 3, "isExtra": true },
+              { "位置": "L103F", "名稱": "Glass", "顏色": 3, "isExtra": true },
+
+            ]
+          }
+          },
+          "中車": {
+          "長車": {
+          "廚房": [
+          { "位置": "202", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+         { "位置": "203", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+          { "位置": "205", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+          { "位置": "206", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+          { "位置": "207", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+          { "位置": "L201", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+
+          ]
+          },
+          "短車": {
+            "廚房": [
+              { "位置": "L202F", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+              { "位置": "305R", "名稱": "W Fruit", "顏色": 2, "isExtra": true },
+              { "位置": "S3CA01", "名稱": "Extra Snack", "顏色": 2, "isExtra": true },
+
+            ]
+          }
+          },
+
+          "尾車": {
+            "長車": {
+              "廚房": [
+                { "位置": "L503", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "R503", "名稱": "W/Y Hot Snack", "顏色": 2, "isExtra": true },
+                { "位置": "L503", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                
+                { "位置": "604", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "605", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "701", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "704", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "705", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+                { "位置": "804", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+                { "位置": "805", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                { "位置": "806", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+
+              ]
+            },
+            "短車": {
+              "廚房": [
+                { "位置": "504", "名稱": "Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "505", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+                { "位置": "501R", "名稱": "Y Snack", "顏色": 2, "isExtra": true },
+                { "位置": "502F", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true },
+
+              ]
+            }
+          }
+          }
+        }, 
+
+        ]
+
+        };
+        
+        // 定义设备类型索引常量
+        const EQUIPMENT_INDEX = {
+            KITCHEN: 0,
+            BAR: 1,
+            ELDERLY: 2,
+            WATER: 3
+        };
+
+        // DOM元素
+        const flightNumberInput = document.getElementById('flightNumber');
+        const aircraftTypeSelect = document.getElementById('aircraftType');
+        const resultsDiv = document.getElementById('results');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // 标签页切换功能
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有active类
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // 添加active类到当前按钮和内容
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // 更新当前标签页的内容
+                updateCurrentTab();
+            });
+        });
+
+        // 处理航机编号输入
+        function handleFlightNumberInput() {
+            const flightNumber = flightNumberInput.value.trim();
+
+            if (!flightNumber) {
+                aircraftTypeSelect.innerHTML = '<option value="">請输入航班編號</option>';
+                aircraftTypeSelect.disabled = true;
+                resultsDiv.innerHTML = '<p class="no-results">請输入航班編號進行查詢</p>';
+                return;
+            }
+
+            resultsDiv.innerHTML = '<p class="loading">搜索中...</p>';
+
+            // 模拟API请求延迟
+            setTimeout(() => {
+                const aircraftData = flightData[flightNumber];
+                if (!aircraftData) {
+                    showNoResults();
+                    aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
+                    aircraftTypeSelect.disabled = true;
+                    return;
+                }
+
+                // 更新机型下拉选项
+                const types = Object.keys(aircraftData);
+                updateAircraftTypeOptions(types);
+
+                if (types.length === 1) {
+                    displayResults(flightNumber, types[0]);
+                    aircraftTypeSelect.value = types[0];
+                } else {
+                    showTypeSelectionPrompt(flightNumber, types);
+                }
+            }, 300);
+        }
+
+        // 处理机型选择变化
+        function handleAircraftTypeChange() {
+            const flightNumber = flightNumberInput.value.trim();
+            const aircraftType = aircraftTypeSelect.value;
+
+            if (!flightNumber || !aircraftType) return;
+
+            // 更新当前标签页的内容
+            updateCurrentTab();
+        }
+
+        // 更新当前标签页的内容
+        function updateCurrentTab() {
+            const flightNumber = flightNumberInput.value.trim();
+            const aircraftType = aircraftTypeSelect.value;
+            
+            if (!flightNumber || !aircraftType) return;
+            
+            const activeTab = document.querySelector('.tab-content.active').id;
+            
+            if (activeTab === 'total') {
+                displayResults(flightNumber, aircraftType);
+            } else if (activeTab === 'tray') {
+                showTrayConfig(flightNumber, aircraftType);
+            }
+        }
+
+        // 更新机型下拉选项
+        function updateAircraftTypeOptions(types) {
+            if (types.length === 0) {
+                aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
+                aircraftTypeSelect.disabled = true;
+            } else {
+                aircraftTypeSelect.innerHTML = '<option value="">請選擇機型</option>';
+                types.forEach(type => {
+                    aircraftTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                });
+                aircraftTypeSelect.disabled = false;
+            }
+        }
+
+        // 显示无结果
+        function showNoResults() {
+            resultsDiv.innerHTML = '<p class="no-results">找不到符合條件的结果</p>';
+        }
+
+        // 显示机型选择提示
+        function showTypeSelectionPrompt(flightNumber, types) {
+            resultsDiv.innerHTML = `
+                <div class="info-message">
+                    <h3>航班編號: ${flightNumber}</h3>
+                    <p>此航班有 ${types.length} 種機型: ${types.join(', ')}</p>
+                    <p>請從下拉選單中選擇機型查看詳细資料</p>
+                </div>
+            `;
+        }
+
+        // 显示设备查询结果
+        function displayResults(flightNumber, aircraftType) {
+            const data = flightData[flightNumber][aircraftType];
+            if (!data) {
+                showNoResults();
+                return;
+            }
+
+            let html = `<h3>航班編號: ${flightNumber}</h3>`;
+            html += `<h3>機型: ${aircraftType}</h3>`;
+
+            for (const carType in data) {
+                html += `<h4 class="section-title"><i class="fas fa-train"></i> ${carType}</h4>`;
+                html += `<table>
+                    <thead>
+                        <tr>
+                            <th>設備類型</th>
+                            <th>厨房</th>
+                            <th>酒倉</th>
+                            <th>老㩒</th>
+                            <th>水吧</th>
+                            <th>總數</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                for (const equipmentType in data[carType]) {
+                    const equipment = data[carType][equipmentType];
+                    // 动态计算 total
+                    const total = equipment.reduce((acc, val) => acc + val, 0);
+                    html += `<tr>
+                        <td>${equipmentType}</td>
+                        <td>${equipment[EQUIPMENT_INDEX.KITCHEN]}</td>
+                        <td>${equipment[EQUIPMENT_INDEX.BAR]}</td>
+                        <td>${equipment[EQUIPMENT_INDEX.ELDERLY]}</td>
+                        <td>${equipment[EQUIPMENT_INDEX.WATER]}</td>
+                        <td>${total}</td>
                     </tr>`;
+                }
+
+                html += `</tbody></table>`;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+        
+        // 显示餐车配置
+        function showTrayConfig(flightNumber, aircraftType) {
+            // 获取基础配置
+            let config = positionConfig[aircraftType];
+            const configContent = document.getElementById('config-content');
+            
+            if (!config) {
+                configContent.innerHTML = `
+                    <div class="info-box">
+                        <h3><i class="fas fa-exclamation-triangle"></i> 錯誤</h3>
+                        <p>未找到所選機型的配置信息</p>
+                        <p>航班: ${flightNumber} | 機型: ${aircraftType}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 复制配置（避免修改原始数据）
+            config = JSON.parse(JSON.stringify(config));
+            
+            // 检查是否有额外配置
+            if (extraConfig[aircraftType]) {
+                let configGroups = extraConfig[aircraftType];
+                
+                // 如果配置组是数组（支持多个配置组）
+                if (Array.isArray(configGroups)) {
+                    for (const configGroup of configGroups) {
+                        if (configGroup.flights.includes(flightNumber)) {
+                            applyExtraConfig(config, configGroup.config);
+                            break; // 只应用一个匹配的配置组
+                        }
+                    }
+                } 
+                // 如果配置组是对象（单一配置组）
+                else if (configGroups.flights.includes(flightNumber)) {
+                    applyExtraConfig(config, configGroups.config);
+                }
+            }
+            
+            // 生成配置显示HTML
+            let html = `
+                <div class="info-box">
+                    <h3><i class="fas fa-plane-departure"></i> 當前配置</h3>
+                    <p>航班編號: ${flightNumber} | 機型: ${aircraftType}</p>
+                </div>
+            `;
+            
+            // 定义车序顺序
+            const carOrder = ["頭車", "中車", "尾車"];
+            
+            // 遍历配置
+            for (const car of carOrder) {
+                if (config[car]) {
+                    html += `<div class="car-section">`;
+                    html += `<div class="car-header"><i class="fas fa-train"></i> ${car}</div>`;
+                    
+                    for (const carType in config[car]) {
+                        for (const area in config[car][carType]) {
+                            const positions = config[car][carType][area];
+                            const count = positions.length;
+                            
+                            html += `<div class="area-section">`;
+                            html += `<div class="area-header">
+                                <div class="area-title">
+                                    <i class="fas fa-${area === '廚房' ? 'utensils' : 'glass-whiskey'}"></i> 
+                                    ${area} (${carType})
+                                </div>
+                                <div class="position-count">${count} 位置</div>
+                            </div>`;
+                            
+                            html += `<div class="position-grid">`;
+                            
+                            // 对位置进行排序
+                            positions.sort((a, b) => a.位置.localeCompare(b.位置));
+                            
+                            // 显示每个位置
+                            for (const position of positions) {
+                                const extraClass = position.isExtra ? "extra" : "";
+                                html += `
+                                    <div class="position-card ${extraClass}">
+                                        <div class="position-id">${position.位置}</div>
+                                        <div class="position-name">${position.名稱}</div>
+                                        <div class="position-color color-${position.顏色}"></div>
+                                    </div>
+                                `;
+                            }
+                            
+                            html += `</div></div>`;
+                        }
+                    }
+                    
+                    html += `</div>`;
+                }
+            }
+            
+            configContent.innerHTML = html;
+        }
+        
+        // 应用额外配置
+        function applyExtraConfig(baseConfig, extra) {
+            // 处理隐藏配置
+            for (const car in extra) {
+                if (!baseConfig[car]) baseConfig[car] = {};
+                
+                for (const carType in extra[car]) {
+                    if (!baseConfig[car][carType]) baseConfig[car][carType] = {};
+                    
+                    for (const area in extra[car][carType]) {
+                        if (!baseConfig[car][carType][area]) {
+                            baseConfig[car][carType][area] = [];
+                        }
+                        
+                        // 处理每个位置
+                        for (const position of extra[car][carType][area]) {
+                            // 处理隐藏位置
+                            if (position.hide) {
+                                const index = baseConfig[car][carType][area].findIndex(
+                                    p => p.位置 === position.位置
+                                );
+                                if (index !== -1) {
+                                    baseConfig[car][carType][area].splice(index, 1);
+                                }
+                            } 
+                            // 处理替换/添加位置
+                            else {
+                                const existingIndex = baseConfig[car][carType][area].findIndex(
+                                    p => p.位置 === position.位置
+                                );
+                                
+                                if (existingIndex !== -1) {
+                                    // 替换已有位置
+                                    baseConfig[car][carType][area][existingIndex] = position;
+                                } else {
+                                    // 添加新位置
+                                    baseConfig[car][carType][area].push(position);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-        
-        html += `</tbody></table></div>`;
-    }
-    
-    displayDiv.innerHTML = html;
-});
+
+        // 事件监听器
+        flightNumberInput.addEventListener('input', handleFlightNumberInput);
+        aircraftTypeSelect.addEventListener('change', handleAircraftTypeChange);
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 默认显示设备查询页
+            updateCurrentTab();
+        });
     </script>
 </body>
 </html>
