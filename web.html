@@ -512,17 +512,7 @@
         const JSON_URL3 = "https://cow0804.github.io/testupload/extraconfig.json";
 
         // 載入遠程 flightData.json 並獲取最後修改時間
-        fetch(JSON_URL2, { method: 'HEAD' })
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
-                const lastModifiedHeader = response.headers.get('Last-Modified');
-                return lastModifiedHeader ? new Date(lastModifiedHeader) : new Date();
-            })
-            .then(date => {
-                lastModified = date;
-                updateLastModifiedTime();
-                return fetch(JSON_URL2);
-            })
+        fetch(JSON_URL2)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
                 return response.json();
@@ -541,18 +531,8 @@
                 `;
                 document.getElementById('updateTime').textContent = '無法取得資料更新時間';
             });
-        fetch(JSON_URL3, { method: 'HEAD' })
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
-                const lastModifiedHeader = response.headers.get('Last-Modified');
-                return lastModifiedHeader ? new Date(lastModifiedHeader) : new Date();
-            })
-            .then(date => {
-                lastModified = date;
-                updateLastModifiedTime();
-                return fetch(JSON_URL3);
-            })
-            .then(response => {
+        fetch(JSON_URL3)
+         .then(response => {
                 if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
                 return response.json();
             })
