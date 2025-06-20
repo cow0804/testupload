@@ -481,6 +481,7 @@
         
         <footer>
             <p>航班設備與餐車配置系统 &copy; 2025</p>
+            <p class="update-time" id="updateTime">資料最後更新時間: 載入中...</p>
         </footer>
     </div>
     
@@ -501,76 +502,121 @@
     const tabContents = document.querySelectorAll('.tab-content');
 
     // 全局变量存储数据
-    let flightData = {};
-    let positionConfig = {};
-    let extraConfig = {};
+    let flightData = null;
+    let lastModified = null;
+    let positionConfig = null;
+    let extraConfig = null;
+    
+        const JSON_URL1 = "https://cow0804.github.io/testupload/flightdata.json";
+        const JSON_URL2 = "https://cow0804.github.io/testupload/positionconfig.json";
+        const JSON_URL3 = "https://cow0804.github.io/testupload/extraconfig.json";
 
-    // 加载JSON数据
-// 加载JSON数据
-async function loadData() {
-    try {
-        const [flightDataResponse, positionConfigResponse, extraConfigResponse] = await Promise.all([
-            fetch('https://cow0804.github.io/testupload/flightdata.json'),
-            fetch('https://cow0804.github.io/testupload/positionconfig.json'),
-            fetch('https://cow0804.github.io/testupload/extraconfig.json')
-        ]);
-        
-        if (!flightDataResponse.ok || !positionConfigResponse.ok || !extraConfigResponse.ok) {
-            throw new Error('Failed to load data');
+        // 載入遠程 flightData.json 並獲取最後修改時間
+        fetch(JSON_URL2, { method: 'HEAD' })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                const lastModifiedHeader = response.headers.get('Last-Modified');
+                return lastModifiedHeader ? new Date(lastModifiedHeader) : new Date();
+            })
+            .then(date => {
+                lastModified = date;
+                updateLastModifiedTime();
+                return fetch(JSON_URL2);
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                positionConfig = data;
+                console.log('JSON數據載入成功');
+            })
+            .catch(error => {
+                console.error('加載JSON失敗:', error);
+                document.getElementById('results').innerHTML = `
+                    <div class="error-message">
+                        <p>數據載入失敗，請檢查網絡連接</p>
+                        <p>錯誤詳情: ${error.message}</p>
+                    </div>
+                `;
+                document.getElementById('updateTime').textContent = '無法取得資料更新時間';
+            });
+        fetch(JSON_URL3, { method: 'HEAD' })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                const lastModifiedHeader = response.headers.get('Last-Modified');
+                return lastModifiedHeader ? new Date(lastModifiedHeader) : new Date();
+            })
+            .then(date => {
+                lastModified = date;
+                updateLastModifiedTime();
+                return fetch(JSON_URL3);
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                extraConfig = data;
+                console.log('JSON數據載入成功');
+            })
+            .catch(error => {
+                console.error('加載JSON失敗:', error);
+                document.getElementById('results').innerHTML = `
+                    <div class="error-message">
+                        <p>數據載入失敗，請檢查網絡連接</p>
+                        <p>錯誤詳情: ${error.message}</p>
+                    </div>
+                `;
+                document.getElementById('updateTime').textContent = '無法取得資料更新時間';
+            });
+        fetch(JSON_URL1, { method: 'HEAD' })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                const lastModifiedHeader = response.headers.get('Last-Modified');
+                return lastModifiedHeader ? new Date(lastModifiedHeader) : new Date();
+            })
+            .then(date => {
+                lastModified = date;
+                updateLastModifiedTime();
+                return fetch(JSON_URL1);
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                flightData = data;
+                console.log('JSON數據載入成功');
+            })
+            .catch(error => {
+                console.error('加載JSON失敗:', error);
+                document.getElementById('results').innerHTML = `
+                    <div class="error-message">
+                        <p>數據載入失敗，請檢查網絡連接</p>
+                        <p>錯誤詳情: ${error.message}</p>
+                    </div>
+                `;
+                document.getElementById('updateTime').textContent = '無法取得資料更新時間';
+            });
+
+        function updateLastModifiedTime() {
+            if (!lastModified) return;
+            
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+                timeZone: 'Asia/Taipei'
+            };
+            
+            const formattedDate = lastModified.toLocaleDateString('zh-TW', options);
+            document.getElementById('updateTime').textContent = `資料最後更新時間: ${formattedDate}`;
         }
-        
-        flightData = await flightDataResponse.json();
-        positionConfig = await positionConfigResponse.json();
-        extraConfig = await extraConfigResponse.json();
-        
-        console.log('Data loaded successfully');
-        
-        // 獲取flightdata.json的最後修改時間
-        const lastModified = await getLastModifiedTime('https://cow0804.github.io/testupload/flightdata.json');
-        updateDataTimeDisplay(lastModified);
-        
-    } catch (error) {
-        console.error('Error loading data:', error);
-        // 显示错误信息给用户
-        resultsDiv.innerHTML = `
-            <div class="info-box">
-                <h3><i class="fas fa-exclamation-triangle"></i> 錯誤</h3>
-                <p>無法加載配置數據，請稍後再試</p>
-            </div>
-        `;
-        // 更新時間顯示為錯誤狀態
-        document.getElementById('data-update-time').textContent = '資料更新時間: 獲取失敗';
-    }
-}
-
-// 獲取文件最後修改時間
-async function getLastModifiedTime(url) {
-    try {
-        const response = await fetch(url, { method: 'HEAD' });
-        if (!response.ok) throw new Error('Failed to get last modified time');
-        
-        const lastModified = response.headers.get('last-modified');
-        return lastModified ? new Date(lastModified) : new Date();
-    } catch (error) {
-        console.error('Error getting last modified time:', error);
-        return new Date(); // 如果獲取失敗，返回當前時間
-    }
-}
-
-// 更新時間顯示
-function updateDataTimeDisplay(date) {
-    const timeElement = document.getElementById('data-update-time');
-    if (!date) {
-        timeElement.textContent = '資料更新時間: 未知';
-        return;
-    }
-    
-    // 格式化日期為中文格式 (YYYY年MM月DD日 HH:MM)
-    const formattedDate = `${date.getFullYear()}年${(date.getMonth() + 1).toString().padStart(2, '0')}月${date.getDate().toString().padStart(2, '0')}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-    
-    timeElement.textContent = `航班資料最後更新時間: ${formattedDate}`;
-    timeElement.title = `完整時間: ${date.toString()}`;
-}
     // 标签页切换功能
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
