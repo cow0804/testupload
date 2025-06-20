@@ -50,7 +50,6 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
         }
         table {
             width: 100%;
@@ -95,27 +94,6 @@
             color: #666;
             padding: 20px;
         }
-        .error-message {
-            text-align: center;
-            color: #a94442;
-            background-color: #f2dede;
-            border: 1px solid #ebccd1;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .footer {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-            margin-top: 30px;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-        }
-        .update-time {
-            font-style: italic;
-            margin-top: 5px;
-        }
     </style>
 </head>
 <body>
@@ -136,66 +114,15 @@
         <p class="no-results">請輸入航機編號進行查詢</p>
     </div>
 
-    <div class="footer">
-        <p>航班餐車設備查詢系統 &copy; 2023</p>
-        <p class="update-time" id="updateTime">資料最後更新時間: 載入中...</p>
-    </div>
-
     <script>
-        let flightData = null;
-        let lastModified = null;
         const EQUIPMENT_INDEX = { KITCHEN: 0, BAR: 1, ELDERLY: 2, WATER: 3 };
-        const JSON_URL = "https://cow0804.github.io/testupload/flightdata.json";
-
-        // 載入遠程 flightData.json 並獲取最後修改時間
-        fetch(JSON_URL, { method: 'HEAD' })
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
-                const lastModifiedHeader = response.headers.get('Last-Modified');
-                return lastModifiedHeader ? new Date(lastModifiedHeader) : new Date();
-            })
-            .then(date => {
-                lastModified = date;
-                updateLastModifiedTime();
-                return fetch(JSON_URL);
-            })
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                flightData = data;
-                console.log('JSON數據載入成功');
-            })
-            .catch(error => {
-                console.error('加載JSON失敗:', error);
-                document.getElementById('results').innerHTML = `
-                    <div class="error-message">
-                        <p>數據載入失敗，請檢查網絡連接</p>
-                        <p>錯誤詳情: ${error.message}</p>
-                    </div>
-                `;
-                document.getElementById('updateTime').textContent = '無法取得資料更新時間';
-            });
-
-        function updateLastModifiedTime() {
-            if (!lastModified) return;
-            
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-                timeZone: 'Asia/Taipei'
-            };
-            
-            const formattedDate = lastModified.toLocaleDateString('zh-TW', options);
-            document.getElementById('updateTime').textContent = `資料最後更新時間: ${formattedDate}`;
-        }
-
+        const BASE_URL = 'https://cow0804.github.io/testupload/flightdata/';
+        
+        // 緩存已加載的數據範圍
+        const loadedData = {};
+        // 存儲當前查詢的航班數據
+        let currentFlightData = null;
+        
         const flightNumberInput = document.getElementById('flightNumber');
         const aircraftTypeSelect = document.getElementById('aircraftType');
         const resultsDiv = document.getElementById('results');
@@ -203,111 +130,140 @@
         flightNumberInput.addEventListener('input', handleFlightNumberInput);
         aircraftTypeSelect.addEventListener('change', handleAircraftTypeChange);
 
-        function handleFlightNumberInput() {
-            const flightNumber = flightNumberInput.value.trim();
-            if (!flightNumber) {
-                resetSearchState();
-                return;
-            }
-
-            if (!flightData) {
-                showLoadingMessage("數據正在載入中，請稍候...");
-                return;
-            }
-
-            showLoadingMessage("搜尋中...");
-
-            // 查找匹配的航班數據
-            const matchedFlights = findMatchingFlights(flightNumber);
+        // 根據航機編號加載對應範圍的數據
+        async function loadFlightDataRange(flightNumber) {
+            // 確定數據範圍 (100-199, 200-299 等)
+            const firstDigit = flightNumber.charAt(0);
+            const range = `${firstDigit}00_${firstDigit}99`;
+            const fileName = `flightdata_${range}.json`;
             
-            if (matchedFlights.length === 0) {
-                showNoResults();
+            // 檢查是否已加載過該範圍
+            if (loadedData[range]) {
+                return loadedData[range];
+            }
+            
+            try {
+                resultsDiv.innerHTML = '<p class="loading">載入數據中...</p>';
+                
+                const response = await fetch(`${BASE_URL}${fileName}`);
+                if (!response.ok) throw new Error(`無法載入 ${fileName}`);
+                
+                const data = await response.json();
+                // 緩存加載的數據
+                loadedData[range] = data;
+                return data;
+            } catch (error) {
+                console.error('加載數據失敗:', error);
+                resultsDiv.innerHTML = `<p class="no-results">數據載入失敗: ${error.message}</p>`;
+                return null;
+            }
+        }
+
+        async function handleFlightNumberInput() {
+            const flightNumber = flightNumberInput.value.trim();
+            
+            if (!flightNumber) {
+                resetUI();
+                return;
+            }
+            
+            // 驗證航機編號格式 (3位數字)
+            if (!/^\d{3}$/.test(flightNumber)) {
+                resultsDiv.innerHTML = '<p class="no-results">請輸入3位數字的航機編號</p>';
                 aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
                 aircraftTypeSelect.disabled = true;
                 return;
             }
-
-            updateAircraftTypeOptions(matchedFlights);
-            handleMultipleAircraftTypes(flightNumber, matchedFlights);
-        }
-
-        function findMatchingFlights(flightNumber) {
-            return Object.keys(flightData)
-                .filter(key => key.includes(flightNumber))
-                .sort();
-        }
-
-        function resetSearchState() {
-            aircraftTypeSelect.innerHTML = '<option value="">請輸入航機編號</option>';
-            aircraftTypeSelect.disabled = true;
-            resultsDiv.innerHTML = '<p class="no-results">請輸入航機編號進行查詢</p>';
-        }
-
-        function showLoadingMessage(message) {
-            resultsDiv.innerHTML = `<p class="loading">${message}</p>`;
-        }
-
-        function updateAircraftTypeOptions(matchedFlights) {
-            aircraftTypeSelect.innerHTML = '<option value="">請選擇機型</option>';
-            matchedFlights.forEach(flight => {
-                const types = Object.keys(flightData[flight]);
-                types.forEach(type => {
-                    aircraftTypeSelect.innerHTML += `<option value="${flight}|${type}">${type} (${flight})</option>`;
-                });
-            });
-            aircraftTypeSelect.disabled = false;
-        }
-
-        function handleMultipleAircraftTypes(flightNumber, matchedFlights) {
-            if (matchedFlights.length === 1) {
-                const flightKey = matchedFlights[0];
-                const types = Object.keys(flightData[flightKey]);
+            
+            resultsDiv.innerHTML = '<p class="loading">搜尋中...</p>';
+            
+            try {
+                // 加載對應範圍的數據
+                const rangeData = await loadFlightDataRange(flightNumber);
+                if (!rangeData) return;
                 
-                if (types.length === 1) {
-                    displayResults(flightKey, types[0]);
-                    aircraftTypeSelect.value = `${flightKey}|${types[0]}`;
-                } else {
-                    showTypeSelectionPrompt(flightKey, types);
+                // 從範圍數據中獲取當前航班數據
+                currentFlightData = rangeData[flightNumber];
+                
+                if (!currentFlightData) {
+                    showNoResults();
+                    aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
+                    aircraftTypeSelect.disabled = true;
+                    return;
                 }
-            } else {
-                showMultipleFlightPrompt(matchedFlights);
+                
+                // 獲取可用機型
+                const types = Object.keys(currentFlightData);
+                updateAircraftTypeOptions(types);
+
+                if (types.length === 1) {
+                    displayResults(flightNumber, types[0]);
+                    aircraftTypeSelect.value = types[0];
+                } else {
+                    showTypeSelectionPrompt(flightNumber, types);
+                }
+            } catch (error) {
+                console.error('處理航班編號時出錯:', error);
+                resultsDiv.innerHTML = `<p class="no-results">處理數據時出錯: ${error.message}</p>`;
             }
         }
 
-        function showTypeSelectionPrompt(flightKey, types) {
-            resultsDiv.innerHTML = `
-                <div class="info-message">
-                    <h3>找到航班: ${flightKey}</h3>
-                    <p>此航班有 ${types.length} 種機型: ${types.join(', ')}</p>
-                    <p>請從下拉選單中選擇機型</p>
-                </div>
-            `;
-        }
-
-        function showMultipleFlightPrompt(matchedFlights) {
-            resultsDiv.innerHTML = `
-                <div class="info-message">
-                    <h3>找到多個匹配航班</h3>
-                    <p>共找到 ${matchedFlights.length} 個匹配航班:</p>
-                    <ul style="text-align: left; max-width: 300px; margin: 0 auto;">
-                        ${matchedFlights.map(flight => `<li>${flight}</li>`).join('')}
-                    </ul>
-                    <p>請從下拉選單中選擇具體航班和機型</p>
-                </div>
-            `;
-        }
-
         function handleAircraftTypeChange() {
-            const selectedValue = aircraftTypeSelect.value;
-            if (!selectedValue) return;
+            const flightNumber = flightNumberInput.value.trim();
+            const aircraftType = aircraftTypeSelect.value;
             
-            const [flightKey, aircraftType] = selectedValue.split('|');
-            displayResults(flightKey, aircraftType);
+            if (!flightNumber || !aircraftType || !currentFlightData) return;
+            
+            if (!currentFlightData[aircraftType]) {
+                showNoResults();
+                return;
+            }
+            
+            displayResults(flightNumber, aircraftType);
         }
 
-        function displayResults(flightKey, aircraftType) {
-            const data = flightData[flightKey][aircraftType];
-            let html = `<h3>航班編號: ${flightKey}</h3>`;
+        function resetUI() {
+            aircraftTypeSelect.innerHTML = '<option value="">請輸入航機編號</option>';
+            aircraftTypeSelect.disabled = true;
+            resultsDiv.innerHTML = '<p class="no-results">請輸入航機編號進行查詢</p>';
+            currentFlightData = null;
+        }
+
+        function updateAircraftTypeOptions(types) {
+            aircraftTypeSelect.innerHTML = '<option value="">請選擇機型</option>';
+            
+            types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                aircraftTypeSelect.appendChild(option);
+            });
+            
+            aircraftTypeSelect.disabled = false;
+        }
+
+        function showNoResults() {
+            resultsDiv.innerHTML = '<p class="no-results">找不到符合條件的結果</p>';
+        }
+
+        function showTypeSelectionPrompt(flightNumber, types) {
+            resultsDiv.innerHTML = `
+                <div class="info-message">
+                    <h3>航機編號: ${flightNumber}</h3>
+                    <p>此航機有 ${types.length} 種機型: ${types.join(', ')}</p>
+                    <p>請從下拉選單中選擇機型查看詳細資料</p>
+                </div>
+            `;
+        }
+
+        function displayResults(flightNumber, aircraftType) {
+            if (!currentFlightData || !currentFlightData[aircraftType]) {
+                showNoResults();
+                return;
+            }
+            
+            const data = currentFlightData[aircraftType];
+            let html = `<h3>航機編號: ${flightNumber}</h3>`;
             html += `<h3>機型: ${aircraftType}</h3>`;
 
             for (const carType in data) {
@@ -342,10 +298,6 @@
             }
 
             resultsDiv.innerHTML = html;
-        }
-
-        function showNoResults() {
-            resultsDiv.innerHTML = '<p class="no-results">找不到符合條件的結果</p>';
         }
     </script>
 </body>
