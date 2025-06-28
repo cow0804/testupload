@@ -367,6 +367,46 @@
             }
           },
         {
+          "_comment_": " 頭4,中1，尾9(尾2隻小食)",
+          "flights": ["982"],
+          "config": {
+            "頭車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "101", "名稱": "J Meal Bag", "顏色": 1, "isExtra": true },
+                  { "位置": "104", "名稱": "J Meal Bag", "顏色": 2, "isExtra": true },
+                  { "位置": "105", "名稱": "Crew Meal", "顏色": 2, "isExtra": true }
+                  
+                ]
+              }
+            },
+            "中車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "204", "名稱": "Y Meal Bag", "顏色": 2, "isExtra": true }
+                ]
+              }
+            },
+            "尾車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "702", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                  { "位置": "703", "名稱": "Snack", "顏色": 2, "isExtra": true },
+                  { "位置": "602", "名稱": "Y Meal Bag", "顏色": 1, "isExtra": true },
+                  { "位置": "603", "名稱": "Y Meal Bag", "顏色": 1, "isExtra": true },
+                  { "位置": "604", "名稱": "Y Meal Bag", "顏色": 1, "isExtra": true },
+                  { "位置": "605", "hide": true },
+                  { "位置": "606", "hide": true },
+                  { "位置": "607", "名稱": "Y Meal Bag", "顏色": 1, "isExtra": true },
+                  { "位置": "704", "名稱": "Y Meal Bag", "顏色": 2, "isExtra": true },
+                  { "位置": "705", "名稱": "Y Meal Bag", "顏色": 2, "isExtra": true },
+                  { "位置": "707", "名稱": "Y Meal Bag", "顏色": 1, "isExtra": true }
+                ]
+              }
+            }
+          }
+        },           
+        {
           "_comment_": "多1個雪糕",
           "flights": ["771"],
           "config": {
@@ -1230,6 +1270,20 @@
               }
             }
           },
+          {
+            "_comment_": "多1隻雪糕，1隻特別餐",
+            "flights": ["783"],
+            "config": {
+              "尾車": {
+                "長車": {
+                  "廚房": [
+                    { "位置": "702", "名稱": "Return特別餐", "顏色": 2, "isExtra": true },
+                    { "位置": "706", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+                  ]
+                }
+              }
+            }
+          },          
           { "_comment_": "頭少一隻104,尾多2隻小食櫃", 
             "flights": ["978", "990", "994"],
             "config": {
@@ -2635,7 +2689,7 @@
           "短車": {
             "廚房": [
               { "位置": "L202F", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
-              { "位置": "304F", "名稱": "W Fruit", "顏色": 2, "isExtra": true }
+              { "位置": "304F", "名稱": "W Fruit", "顏色": 1, "isExtra": true }
 
             ]
           }
