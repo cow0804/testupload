@@ -2888,6 +2888,58 @@
             }
           },
           {
+            "_comment_": " 頭11,中6,尾10,c103RF係entree",
+            "flights": ["163"],
+            "config": {
+              "頭車": {
+                "長車": {
+                  "廚房": [
+                    { "位置": "L101", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+                    { "位置": "L102", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+                    
+                    { "位置": "201", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+                    { "位置": "202", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+                    { "位置": "203", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                    { "位置": "204", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                    { "位置": "206", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+                    { "位置": "302", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                    { "位置": "303", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                    { "位置": "304", "名稱": "J Entree", "顏色": 1, "isExtra": true }
+                  ]
+                },
+                "短車": {
+                  "廚房": [
+                    { "位置": "R2-03F", "名稱": "W/Y Bread", "顏色": 2, "isExtra": true },
+                    { "位置": "C103R", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+                    { "位置": "C103F", "名稱": "J Entrer", "顏色": 2, "isExtra": true }
+                  ]
+                }
+              },
+              "中車": {
+                "長車": {
+                  "廚房": [
+                    { "位置": "503", "名稱": "W Ice Cream", "顏色": 2, "isExtra": true },
+                    { "位置": "504", "名稱": "W/Y Entree", "顏色": 2, "isExtra": true }
+                  ]
+                }
+              },
+              "尾車": {
+                "長車": {
+                  "廚房": [
+                    { "位置": "605", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                    { "位置": "606", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                    { "位置": "607", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                    { "位置": "608", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                    
+                    { "位置": "704", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                    { "位置": "706", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+                    { "位置": "707", "名稱": "CA Meal", "顏色": 2, "isExtra": true }
+                  ]
+                }
+              }
+            }
+          },
+          {
             "_comment_": " 頭11,中6,尾10",
             "flights": ["139"],
             "config": {
