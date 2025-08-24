@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>航班設備與餐車配置系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+        }
+        
+        :root {
+            --primary: #1a2a6c;
+            --secondary: #2c3e50;
+            --accent: #b21f1f;
+            --light: #f5f8fa;
+            --dark: #1e2a38;
+            --success: #4CAF50;
+            --info: #2196F3;
+            --warning: #FFC107;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2.4rem;
+        }
+        
+        .subtitle {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        /* 输入区域样式 */
+        .input-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .form-control {
+            flex: 1;
+            min-width: 220px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.2);
+            outline: none;
+        }
+        
+        /* 标签页样式 */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50px;
+            padding: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-btn {
+            padding: 12px 30px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab-btn i {
+            font-size: 18px;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(26, 42, 108, 0.3);
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: rgba(26, 42, 108, 0.1);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 设备查询结果样式 */
+        .results {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            min-height: 300px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .no-results, .loading {
+            text-align: center;
+            padding: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .no-results {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .loading {
+            color: var(--primary);
+        }
+        
+        .section-title {
+            margin-top: 30px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--success);
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* 餐车配置样式 */
+        .config-display {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            min-height: 300px;
+        }
+        
+        .car-section {
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .car-header {
+            background: var(--primary);
+            color: white;
+            padding: 12px 18px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .area-section {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .area-header {
+            color: var(--accent);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: space-between;
+        }
+        
+        .area-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .position-count {
+            background: var(--primary);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+        
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        
+        .position-card {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .position-card.extra {
+            border-left: 3px solid var(--accent);
+        }
+        
+        .position-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .position-id {
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        
+        .position-name {
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        
+        .position-color {
+            height: 12px;
+            width: 100%;
+            border-radius: 2px;
+            margin-top: 4px;
+        }
+        
+        .color-1 { background-color: #87CEEB; } /* 浅蓝 */
+        .color-2 { background-color: #FFB6C1; } /* 浅粉 */
+        .color-3 { background-color: #FFFFFF; border: 1px solid #ddd; } /* 白色 */
+        .color-4 { background-color: #FF6B6B; } /* 红色 */
+        
+        .welcome-section {
+            text-align: center;
+            padding: 30px 15px;
+            color: var(--primary);
+        }
+        
+        .welcome-section i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .welcome-section h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .welcome-section p {
+            max-width: 600px;
+            margin: 0 auto 15px;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.85);
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                flex-direction: column;
+            }
+            
+            .form-control {
+                width: 100%;
+            }
+            
+            .tab-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .position-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .position-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            
+            .position-card {
+                padding: 8px;
+            }
+            
+            .position-id {
+                font-size: 13px;
+            }
+            
+            .position-name {
+                font-size: 12px;
+            }
+            
+            header {
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .input-section, .results, .config-display {
+                padding: 15px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                border-radius: 12px;
+            }
+            
+            .tab-btn {
+                border-radius: 8px;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-plane"></i> 航班設備與餐車配置系统</h1>
+            <p class="subtitle">查詢航班設備與餐車配置</p>
+        </header>
+        
+        <!-- 输入区域 - 独立于标签页 -->
+        <div class="input-section">
+            <div class="form-group">
+                <div class="form-control">
+                    <label for="flightNumber"><i class="fas fa-plane"></i> 航班編號</label>
+                    <input type="text" id="flightNumber" placeholder="例如: 723">
+                </div>
+                
+                <div class="form-control">
+                    <label for="aircraftType"><i class="fas fa-jet-fighter"></i> 選擇機型</label>
+                    <select id="aircraftType" disabled>
+                        <option value="">請输入航班編號</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 标签页导航 -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="total">
+                <i class="fas fa-search"></i> 設備查詢
+            </button>
+            <button class="tab-btn" data-tab="tray">
+                <i class="fas fa-utensils"></i> 餐車配置
+            </button>
+        </div>
+        
+        <!-- 设备查询页面 -->
+        <div id="total" class="tab-content active">
+            <div class="results" id="results">
+                <p class="no-results">請输入航班編號並選擇機型進行查詢</p>
+            </div>
+        </div>
+        
+        <!-- 餐车配置页面 -->
+        <div id="tray" class="tab-content">
+            <div class="config-display">
+                <div id="config-content">
+                    <div class="welcome-section">
+                        <i class="fas fa-utensils"></i>
+                        <h2>航班餐車配置系统</h2>
+                        <p>請输入航班編號並選擇機型查看餐車配置信息</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>航班設備與餐車配置系统 &copy; 2025</p>
+            <p class="update-time" id="updateTime">資料最後更新時間: 載入中...</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 定义设备类型索引常量
+        const EQUIPMENT_INDEX = {
+            KITCHEN: 0,
+            BAR: 1,
+            ELDERLY: 2,
+            WATER: 3
+        };
+
+        // DOM元素
+        const flightNumberInput = document.getElementById('flightNumber');
+        const aircraftTypeSelect = document.getElementById('aircraftType');
+        const resultsDiv = document.getElementById('results');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // 全局变量存储数据
+        let flightData = null;
+        let lastModified = null;
+        let positionConfig = null;
+        let extraConfig = null;
+        
+        // JSON文件基础URL
+        const JSON_BASE_URL = "https://192-168-1-140.lboite65gmail.direct.quickconnect.to/";
+        
+        // 已加载的数据缓存
+        const loadedFlightDataCache = {};
+        let currentFlightRange = null;
+
+        // 根据航班号计算所属范围
+        function getFlightRange(flightNumber) {
+            const flightNum = parseInt(flightNumber);
+            if (isNaN(flightNum)) return null;
+            
+            const lowerBound = Math.floor(flightNum / 100) * 100;
+            const upperBound = lowerBound + 99;
+            return `${lowerBound}_${upperBound}`;
+        }
+
+        // 加载JSON数据
+        function loadJSONData(url) {
+            return fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                    return response.json();
+                });
+        }
+
+        // 加载航班数据
+        function loadFlightData(flightNumber) {
+            const range = getFlightRange(flightNumber);
+            if (!range) {
+                return Promise.reject(new Error("無效的航班編號"));
+            }
+            
+            // 如果当前已加载了相同范围的数据，直接返回
+            if (loadedFlightDataCache[range]) {
+                currentFlightRange = range;
+                return Promise.resolve(loadedFlightDataCache[range]);
+            }
+            
+            // 否则加载新数据
+            const url = `${JSON_BASE_URL}flightdata/flightdata_${range}.json`;
+            return fetch(url, { method: 'HEAD' })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                    return loadJSONData(url);
+                })
+                .then(data => {
+                    // 缓存数据
+                    loadedFlightDataCache[range] = data;
+                    currentFlightRange = range;
+                    return data;
+                });
+        }
+
+        // 初始化加载固定配置
+        function initLoadConfig() {
+            const positionUrl = `${JSON_BASE_URL}positionconfig.json`;
+            const extraUrl = `${JSON_BASE_URL}extraconfig.json`;
+            
+            // 加载positionconfig并获取更新时间
+            return fetch(positionUrl, { method: 'HEAD' })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                    const lastModifiedHeader = response.headers.get('Last-Modified');
+                    lastModified = lastModifiedHeader ? new Date(lastModifiedHeader) : new Date();
+                    updateLastModifiedTime();
+                    return Promise.all([
+                        loadJSONData(positionUrl),
+                        loadJSONData(extraUrl)
+                    ]);
+                })
+                .then(([positionData, extraData]) => {
+                    positionConfig = positionData;
+                    extraConfig = extraData;
+                    console.log('配置數據載入成功');
+                });
+        }
+
+        function updateLastModifiedTime() {
+            if (!lastModified) return;
+            
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+                timeZone: 'Asia/Taipei'
+            };
+            
+            const formattedDate = lastModified.toLocaleDateString('zh-TW', options);
+            document.getElementById('updateTime').textContent = `資料最後更新時間: ${formattedDate}`;
+        }
+
+        // 标签页切换功能
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有active类
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // 添加active类到当前按钮和内容
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // 更新当前标签页的内容
+                updateCurrentTab();
+            });
+        });
+
+        // 处理航机编号输入
+        function handleFlightNumberInput() {
+            const flightNumber = flightNumberInput.value.trim();
+
+            if (!flightNumber) {
+                aircraftTypeSelect.innerHTML = '<option value="">請输入航班編號</option>';
+                aircraftTypeSelect.disabled = true;
+                resultsDiv.innerHTML = '<p class="no-results">請输入航班編號進行查詢</p>';
+                document.getElementById('config-content').innerHTML = `
+                    <div class="welcome-section">
+                        <i class="fas fa-utensils"></i>
+                        <h2>航班餐車配置系统</h2>
+                        <p>請输入航班編號並選擇機型查看餐車配置信息</p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsDiv.innerHTML = '<p class="loading">搜索中...</p>';
+            document.getElementById('config-content').innerHTML = '<p class="loading">載入配置中...</p>';
+
+            // 加载航班数据
+            loadFlightData(flightNumber)
+                .then(data => {
+                    flightData = data;
+                    processFlightData(flightNumber);
+                })
+                .catch(error => {
+                    console.error('加載航班數據失敗:', error);
+                    resultsDiv.innerHTML = `
+                        <div class="error-message">
+                            <p>航班數據載入失敗</p>
+                            <p>錯誤詳情: ${error.message}</p>
+                        </div>
+                    `;
+                    document.getElementById('config-content').innerHTML = `
+                        <div class="error-message">
+                            <p>航班數據載入失敗</p>
+                            <p>錯誤詳情: ${error.message}</p>
+                        </div>
+                    `;
+                });
+        }
+
+        // 处理加载后的航班数据
+        function processFlightData(flightNumber) {
+            const aircraftData = flightData[flightNumber];
+            if (!aircraftData) {
+                showNoResults();
+                aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
+                aircraftTypeSelect.disabled = true;
+                return;
+            }
+
+            // 更新机型下拉选项
+            const types = Object.keys(aircraftData);
+            updateAircraftTypeOptions(types);
+
+            if (types.length === 1) {
+                displayResults(flightNumber, types[0]);
+                aircraftTypeSelect.value = types[0];
+                updateCurrentTab();
+            } else {
+                showTypeSelectionPrompt(flightNumber, types);
+            }
+        }
+
+        // 处理机型选择变化
+        function handleAircraftTypeChange() {
+            const flightNumber = flightNumberInput.value.trim();
+            const aircraftType = aircraftTypeSelect.value;
+
+            if (!flightNumber || !aircraftType) return;
+
+            // 更新当前标签页的内容
+            updateCurrentTab();
+        }
+
+        // 更新当前标签页的内容
+        function updateCurrentTab() {
+            const flightNumber = flightNumberInput.value.trim();
+            const aircraftType = aircraftTypeSelect.value;
+            
+            if (!flightNumber || !aircraftType) return;
+            
+            const activeTab = document.querySelector('.tab-content.active').id;
+            
+            if (activeTab === 'total') {
+                displayResults(flightNumber, aircraftType);
+            } else if (activeTab === 'tray') {
+                showTrayConfig(flightNumber, aircraftType);
+            }
+        }
+
+        // 更新机型下拉选项
+        function updateAircraftTypeOptions(types) {
+            if (types.length === 0) {
+                aircraftTypeSelect.innerHTML = '<option value="">無可用機型</option>';
+                aircraftTypeSelect.disabled = true;
+            } else {
+                aircraftTypeSelect.innerHTML = '<option value="">請選擇機型</option>';
+                types.forEach(type => {
+                    aircraftTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                });
+                aircraftTypeSelect.disabled = false;
+            }
+        }
+
+        // 显示无结果
+        function showNoResults() {
+            resultsDiv.innerHTML = '<p class="no-results">找不到符合條件的结果</p>';
+            document.getElementById('config-content').innerHTML = '<p class="no-results">找不到符合條件的配置</p>';
+        }
+
+        // 显示机型选择提示
+        function showTypeSelectionPrompt(flightNumber, types) {
+            resultsDiv.innerHTML = `
+                <div class="info-message">
+                    <h3>航班編號: ${flightNumber}</h3>
+                    <p>此航班有 ${types.length} 種機型: ${types.join(', ')}</p>
+                    <p>請從下拉選單中選擇機型查看詳细資料</p>
+                </div>
+            `;
+            document.getElementById('config-content').innerHTML = `
+                <div class="info-message">
+                    <h3>航班編號: ${flightNumber}</h3>
+                    <p>此航班有 ${types.length} 種機型: ${types.join(', ')}</p>
+                    <p>請從下拉選單中選擇機型查看餐車配置</p>
+                </div>
+            `;
+        }
+
+        // 显示设备查询结果
+        function displayResults(flightNumber, aircraftType) {
+            const data = flightData[flightNumber][aircraftType];
+            if (!data) {
+                showNoResults();
+                return;
+            }
+
+            let html = `<div class="info-box">
+                <i class="fas fa-plane"></i> 航班編號: ${flightNumber} | 機型: ${aircraftType}
+            </div>`;
+
+            for (const carType in data) {
+                html += `<h4 class="section-title"><i class="fas fa-train"></i> ${carType}</h4>`;
+                html += `<table>
+                    <thead>
+                        <tr>
+                            <th>設備類型</th>
+                            <th>厨房</th>
+                            <th>酒倉</th>
+                            <th>老㩒</th>
+                            <th>水吧</th>
+                            <th>總數</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                for (const equipmentType in data[carType]) {
+                    const equipment = data[carType][equipmentType];
+                    // 动态计算 total
+                    const total = equipment.reduce((acc, val) => acc + val, 0);
+                    html += `<tr>
+                        <td>${equipmentType}</td>
+                        <td>${equipment[EQUIPMENT_INDEX.KITCHEN]}</td>
+                        <td>${equipment[EQUIPMENT_INDEX.BAR]}</td>
+                        <td>${equipment[EQUIPMENT_INDEX.ELDERLY]}</td>
+                        <td>${equipment[EQUIPMENT_INDEX.WATER]}</td>
+                        <td>${total}</td>
+                    </tr>`;
+                }
+
+                html += `</tbody></table>`;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+        
+        // 显示餐车配置
+        function showTrayConfig(flightNumber, aircraftType) {
+            // 获取基础配置
+            let config = positionConfig[aircraftType];
+            const configContent = document.getElementById('config-content');
+            
+            if (!config) {
+                configContent.innerHTML = `
+                    <div class="info-box">
+                        <h3><i class="fas fa-exclamation-triangle"></i> 錯誤</h3>
+                        <p>未找到所選機型的配置信息</p>
+                        <p>航班: ${flightNumber} | 機型: ${aircraftType}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 复制配置（避免修改原始数据）
+            config = JSON.parse(JSON.stringify(config));
+            
+            // 检查是否有额外配置
+            if (extraConfig[aircraftType]) {
+                let configGroups = extraConfig[aircraftType];
+                
+                // 如果配置组是数组（支持多个配置组）
+                if (Array.isArray(configGroups)) {
+                    for (const configGroup of configGroups) {
+                        if (configGroup.flights.includes(flightNumber)) {
+                            applyExtraConfig(config, configGroup.config);
+                            break; // 只应用一个匹配的配置组
+                        }
+                    }
+                } 
+                // 如果配置组是对象（单一配置组）
+                else if (configGroups.flights.includes(flightNumber)) {
+                    applyExtraConfig(config, configGroups.config);
+                }
+            }
+            
+            // 生成配置显示HTML
+            let html = `
+                <div class="info-box">
+                    <h3><i class="fas fa-plane-departure"></i> 當前配置</h3>
+                    <p>航班編號: ${flightNumber} | 機型: ${aircraftType}</p>
+                    ${currentFlightRange ? `<p>數據範圍: ${currentFlightRange}</p>` : ''}
+                </div>
+            `;
+            
+            // 定义车序顺序
+            const carOrder = ["頭車", "中車", "尾車"];
+            
+            // 遍历配置
+            for (const car of carOrder) {
+                if (config[car]) {
+                    html += `<div class="car-section">`;
+                    html += `<div class="car-header"><i class="fas fa-train"></i> ${car}</div>`;
+                    
+                    for (const carType in config[car]) {
+                        for (const area in config[car][carType]) {
+                            const positions = config[car][carType][area];
+                            const count = positions.length;
+                            
+                            html += `<div class="area-section">`;
+                            html += `<div class="area-header">
+                                <div class="area-title">
+                                    <i class="fas fa-${area === '廚房' ? 'utensils' : 'glass-whiskey'}"></i> 
+                                    ${area} (${carType})
+                                </div>
+                                <div class="position-count">${count} 位置</div>
+                            </div>`;
+                            
+                            html += `<div class="position-grid">`;
+                            
+                            // 对位置进行排序
+                            positions.sort((a, b) => a.位置.localeCompare(b.位置));
+                            
+                            // 显示每个位置
+                            for (const position of positions) {
+                                const extraClass = position.isExtra ? "extra" : "";
+                                html += `
+                                    <div class="position-card ${extraClass}">
+                                        <div class="position-id">${position.位置}</div>
+                                        <div class="position-name">${position.名稱}</div>
+                                        <div class="position-color color-${position.顏色}"></div>
+                                    </div>
+                                `;
+                            }
+                            
+                            html += `</div></div>`;
+                        }
+                    }
+                    
+                    html += `</div>`;
+                }
+            }
+            
+            configContent.innerHTML = html;
+        }
+        
+        // 应用额外配置
+        function applyExtraConfig(baseConfig, extra) {
+            // 处理隐藏配置
+            for (const car in extra) {
+                if (!baseConfig[car]) baseConfig[car] = {};
+                
+                for (const carType in extra[car]) {
+                    if (!baseConfig[car][carType]) baseConfig[car][carType] = {};
+                    
+                    for (const area in extra[car][carType]) {
+                        if (!baseConfig[car][carType][area]) {
+                            baseConfig[car][carType][area] = [];
+                        }
+                        
+                        // 处理每个位置
+                        for (const position of extra[car][carType][area]) {
+                            // 处理隐藏位置
+                            if (position.hide) {
+                                const index = baseConfig[car][carType][area].findIndex(
+                                    p => p.位置 === position.位置
+                                );
+                                if (index !== -1) {
+                                    baseConfig[car][carType][area].splice(index, 1);
+                                }
+                            } 
+                            // 处理替换/添加位置
+                            else {
+                                const existingIndex = baseConfig[car][carType][area].findIndex(
+                                    p => p.位置 === position.位置
+                                );
+                                
+                                if (existingIndex !== -1) {
+                                    // 替换已有位置
+                                    baseConfig[car][carType][area][existingIndex] = position;
+                                } else {
+                                    // 添加新位置
+                                    baseConfig[car][carType][area].push(position);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 事件监听器
+        flightNumberInput.addEventListener('input', handleFlightNumberInput);
+        aircraftTypeSelect.addEventListener('change', handleAircraftTypeChange);
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载固定配置
+            initLoadConfig().catch(error => {
+                console.error('加載配置失敗:', error);
+                document.getElementById('updateTime').textContent = '無法取得資料更新時間';
+            });
+        });
+    </script>
+</body>
+</html>
