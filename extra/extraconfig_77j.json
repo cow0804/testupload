@@ -1,0 +1,186 @@
+ [
+        { "_comment_": "多2隻小食，1隻雪糕櫃，1隻麵包櫃", 
+        "flights": ["316", "334", "360"],
+        "config": {
+        "頭車": {
+        "長車": {
+        "廚房": [
+        { "位置": "103", "名稱": "Snack", "顏色": 2, "isExtra": true },
+        { "位置": "306", "名稱": "Snack", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "中車": {
+        "短車": {
+        "廚房": [
+        { "位置": "402R", "名稱": "Ice Cream", "顏色": 2, "isExtra": true }
+        ]
+        }
+        },
+        "尾車": {
+        "長車": {
+        "廚房": [
+        { "位置": "702", "名稱": "Ice Cream", "顏色": 2, "isExtra": true },
+        { "位置": "707", "名稱": "Bread", "顏色": 1, "isExtra": true }
+
+        ]
+        }
+        }
+        
+        }
+        },
+        {
+          "_comment_": "頭8,中5,尾11",
+          "flights": ["506", "526", "588", "598"],
+          "config": {
+            "頭車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "101", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "102", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "103", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "206", "名稱": "J bulk", "顏色": 1, "isExtra": true },
+                  { "位置": "304", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "307", "名稱": "J Tray", "顏色": 1, "isExtra": true }
+                ]
+              },
+              "短車": {
+                "廚房": [
+                  { "位置": "S1-02R", "名稱": "J Bread", "顏色": 2, "isExtra": true },
+                  { "位置": "R1-03R", "名稱": "China J", "顏色": 3, "isExtra": true }, 
+                  { "位置": "R1-03F", "名稱": "Glass J", "顏色": 3, "isExtra": true }, 
+                  { "位置": "S1-02R", "名稱": "J Bread", "顏色": 2, "isExtra": true }, 
+                  { "位置": "202R", "名稱": "Glass J", "顏色": 3, "isExtra": true }, 
+                  { "位置": "202F", "名稱": "Glass J", "顏色": 3, "isExtra": true }
+
+                ]
+              }
+              
+            },
+            "中車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "403", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+                  { "位置": "404", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "503", "名稱": "W/Y Tray", "顏色": 1, "isExtra": true }, 
+                  { "位置": "504", "名稱": "W/Y Tray", "顏色": 1, "isExtra": true }
+                ]
+              }, 
+              "短車": {
+                "廚房": [
+                  { "位置": "402R", "名稱": "W Entree", "顏色": 2, "isExtra": true }
+                ]
+              }
+            },
+            "尾車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "603R", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                  { "位置": "604R", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                  { "位置": "607", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "702", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "703", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "705R", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "707", "名稱": "Y Tray", "顏色": 2, "isExtra": true }
+                  
+                ]
+              }
+            }
+            
+          }
+        },
+        {"_comment_": "頭11,中6,尾11",
+          "flights": ["810"],
+          "config": {
+            "頭車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "101", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "102", "名稱": "W/Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "103", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "104", "名稱": "Crew Meal", "顏色": 1, "isExtra": true },
+                  { "位置": "206", "名稱": "J bulk", "顏色": 1, "isExtra": true },
+                  { "位置": "301", "名稱": "J Tray", "顏色": 1, "isExtra": true },
+                  { "位置": "303", "名稱": "J Bulk", "顏色": 1, "isExtra": true },
+                  { "位置": "304", "hide": true },
+                  
+                  { "位置": "305", "名稱": "J Entree", "顏色": 2, "isExtra": true },
+                  { "位置": "306", "名稱": "J Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "307", "名稱": "J Tray", "顏色": 2, "isExtra": true }
+                ],
+                "水吧": [
+                  { "位置": "304", "名稱": "China J", "顏色": 3, "isExtra": true },
+                  { "位置": "305", "hide": true }
+                ]
+              },
+              "短車": {
+                "水吧": [
+                  { "位置": "S1-01F", "名稱": "China J", "顏色": 3, "isExtra": true },
+                  { "位置": "R1-02R", "名稱": "China J", "顏色": 3, "isExtra": true },
+                  { "位置": "R1-02F", "名稱": "China J", "顏色": 3, "isExtra": true },
+                  { "位置": "R1-03R", "名稱": "Glass J", "顏色": 3, "isExtra": true }, 
+                  { "位置": "R1-03F", "名稱": "Glass J", "顏色": 3, "isExtra": true }, 
+                  { "位置": "105F", "名稱": "China J", "顏色": 3, "isExtra": true }, 
+                  { "位置": "202R", "名稱": "Glass J", "顏色": 3, "isExtra": true }, 
+                  { "位置": "202F", "名稱": "Glass J", "顏色": 3, "isExtra": true }
+
+                ]
+              }
+              
+            },
+            "中車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "403", "名稱": "W Snack", "顏色": 1, "isExtra": true },
+                  { "位置": "404", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "502", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+                  { "位置": "503", "名稱": "W/Y Tray", "顏色": 1, "isExtra": true }, 
+                  { "位置": "504", "名稱": "W/Y Tray", "顏色": 1, "isExtra": true }
+                ]
+              }, 
+              "短車": {
+                "廚房": [
+                  { "位置": "402R", "名稱": "W Entree", "顏色": 2, "isExtra": true }
+                ]
+              }
+            },
+            "尾車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "603R", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                  { "位置": "604R", "名稱": "Y Entree", "顏色": 2, "isExtra": true },
+                  { "位置": "607", "名稱": "Y Tray", "顏色": 1, "isExtra": true },
+                  { "位置": "702", "名稱": "W/Y Hot Snack", "顏色": 2, "isExtra": true },
+                  { "位置": "703", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "705R", "名稱": "Y Tray", "顏色": 2, "isExtra": true },
+                  { "位置": "707", "名稱": "Y Tray", "顏色": 2, "isExtra": true }
+                  
+                ]
+              }
+            }
+            
+          }
+        },
+        {
+          "_comment_": "頭2,中3,尾6",
+          "flights": ["400", "901"],
+          "config": {
+            "頭車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "304", "hide": true }
+                ]
+              }
+            },
+            "尾車": {
+              "長車": {
+                "廚房": [
+                  { "位置": "702", "hide": true },
+                  { "位置": "707", "名稱": "Y Tray", "顏色": 1, "isExtra": true }
+                  
+                ]
+              }
+            }
+          }
+        }        
+        ]
